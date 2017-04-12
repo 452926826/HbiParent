@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="hbi.core.bom.mapper.BomMapper">
+    <resultMap id="BaseResultMap" type="hbi.core.bom.dto.Bom">
+        <result column="BOM_ID" property="bomId" jdbcType="DECIMAL" />
+        <result column="ida2a2" property="ida2a2" jdbcType="VARCHAR" />
+        <result column="linkida2a2" property="linkida2a2" jdbcType="VARCHAR" />
+        <result column="childmasterida2a2" property="childmasterida2a2" jdbcType="VARCHAR" />
+        <result column="id" property="id" jdbcType="VARCHAR" />
+        <result column="parentid" property="parentid" jdbcType="VARCHAR" />
+        <result column="state" property="state" jdbcType="VARCHAR" />
+        <result column="total" property="total" jdbcType="VARCHAR" />
+        <result column="linenum" property="linenum" jdbcType="VARCHAR" />
+        <result column="occurrence" property="occurrence" jdbcType="VARCHAR" />
+        <result column="amount" property="amount" jdbcType="VARCHAR" />
+        <result column="unit" property="unit" jdbcType="VARCHAR" />
+        <result column="childnum" property="childnum" jdbcType="VARCHAR" />
+        <result column="childname" property="childname" jdbcType="VARCHAR" />
+        <result column="partstate" property="partstate" jdbcType="VARCHAR" />
+        <result column="status" property="status" jdbcType="VARCHAR" />
+        <result column="version" property="version" jdbcType="VARCHAR" />
+        <result column="linkweight" property="linkweight" jdbcType="VARCHAR" />
+        <result column="source" property="source" jdbcType="VARCHAR" />
+        <result column="isvirtual" property="isvirtual" jdbcType="VARCHAR" />
+        <result column="priory" property="priory" jdbcType="VARCHAR" />
+        <result column="isBoard" property="isboard" jdbcType="VARCHAR" />
+        <result column="replacement" property="replacement" jdbcType="VARCHAR" />
+        <result column="isborrow" property="isborrow" jdbcType="VARCHAR" />
+        <result column="iskey" property="iskey" jdbcType="VARCHAR" />
+        <result column="discription" property="discription" jdbcType="VARCHAR" />
+        <result column="isselected" property="isselected" jdbcType="VARCHAR" />
+        <result column="view" property="view" jdbcType="VARCHAR" />
+        <result column="material" property="material" jdbcType="VARCHAR" />
+        <result column="producttype" property="producttype" jdbcType="VARCHAR" />
+        <result column="classification" property="classification" jdbcType="VARCHAR" />
+        <result column="sapversion" property="sapversion" jdbcType="VARCHAR" />
+        <result column="drawingsize" property="drawingsize" jdbcType="VARCHAR" />
+        <result column="cadtype" property="cadtype" jdbcType="VARCHAR" />
+        <result column="drawingtype" property="drawingtype" jdbcType="VARCHAR" />
+        <result column="specification" property="specification" jdbcType="VARCHAR" />
+        <result column="marlevel" property="marlevel" jdbcType="VARCHAR" />
+        <result column="weight" property="weight" jdbcType="VARCHAR" />
+    </resultMap>
+
+
+</mapper>
