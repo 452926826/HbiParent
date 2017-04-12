@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="hbi.core.emp.mapper.EmployeesMapper">
+    <resultMap id="BaseResultMap" type="hbi.core.emp.dto.Employees">
+        <result column="EMPLOYEE_ID" property="employeeId" jdbcType="DECIMAL" />
+        <result column="NAME" property="name" jdbcType="VARCHAR" />
+        <result column="SEX" property="sex" jdbcType="VARCHAR" />
+        <result column="NATIVE_PLACE" property="nativePlace" jdbcType="VARCHAR" />
+        <result column="BORN_DATE" property="bornDate" jdbcType="DATE" />
+        <result column="LUCKY_NUM" property="luckyNum" jdbcType="DECIMAL" />
+        <result column="DESCRIPTION" property="description" jdbcType="VARCHAR" />
+        <result column="PROGRAM_ID" property="programId" jdbcType="DECIMAL" />
+        <result column="REQUEST_ID" property="requestId" jdbcType="DECIMAL" />
+        <result column="PARENT_ID" property="parentId" jdbcType="VARCHAR" />
+    </resultMap>
+
+
+</mapper>

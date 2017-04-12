@@ -1,0 +1,46 @@
+<#include "include/header.html">
+    <script src="${base.contextPath}/lib/kendoui/js/kendo.dataviz.min.js"></script>
+    <body>
+        <div id="chart"></div>
+        <script>
+            $("document").ready(function(){
+            $("#chart").kendoChart({
+                title: {
+                    text: "开发时间占比"
+                },
+                legend: {
+                    position: "top"
+                },
+                seriesDefaults: {
+                    labels: {
+                        template: "#= category # - #= kendo.format('{0:P}', percentage)#",
+                        position: "outsideEnd",
+                        visible: true,
+                        background: "transparent"
+                    }
+                },
+                series: [{
+                    type: "pie",
+                    data: [{
+                        category: "需求功能定义",
+                        value: 35
+                    }, {
+                        category: "代码编写",
+                        value: 25
+                    }, {
+                        category: "测试",
+                        value: 30
+                    }, {
+                        category: "维护",
+                        value: 10
+                    }]
+                }],
+                tooltip: {
+                    visible: true,
+                    template: "#= category # - #= kendo.format('{0:P}', percentage) #"
+                }
+            });
+            });
+        </script>
+    </body>
+</html>
