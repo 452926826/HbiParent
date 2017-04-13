@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="hbi.core.bom.mapper.WncUserMapper">
+    <resultMap id="BaseResultMap" type="hbi.core.bom.dto.WncUser">
+        <result column="WNC_USER_ID" property="wncUserId" jdbcType="DECIMAL" />
+        <result column="oid" property="oid" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="number" property="number" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <select id="queryBasic" resultMap="BaseResultMap" parameterType="hbi.core.bom.dto.WncUser">
+        SELECT
+        bwu.WNC_USER_ID,
+        bwu.oid,
+        bwu.`name`,
+        bwu.number,
+        bwu.OBJECT_VERSION_NUMBER
+        FROM
+        bom_wnc_user AS bwu
+        <where>
+            <if test="name!=null">
+                AND name regexp #{name}
+            </if>
+            <if test="number!=null">
+                AND `number` regexp #{number}
+            </if>
+        </where>
+    </select>
+
+</mapper>

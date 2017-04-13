@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="hbi.core.bom.mapper.ChginfoMapper">
+    <resultMap id="BaseResultMap" type="hbi.core.bom.dto.Chginfo">
+        <result column="CHGINFO_ID" property="chginfoId" jdbcType="DECIMAL" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="processor" property="processor" jdbcType="VARCHAR" />
+        <result column="inworksol" property="inworksol" jdbcType="VARCHAR" />
+        <result column="stocksol" property="stocksol" jdbcType="VARCHAR" />
+        <result column="testsol" property="testsol" jdbcType="VARCHAR" />
+        <result column="softwaresol" property="softwaresol" jdbcType="VARCHAR" />
+    </resultMap>
+
+
+</mapper>

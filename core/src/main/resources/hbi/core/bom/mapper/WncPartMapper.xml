@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="hbi.core.bom.mapper.WncPartMapper">
+    <resultMap id="BaseResultMap" type="hbi.core.bom.dto.WncPart">
+        <result column="WNC_PART_ID" property="wncPartId" jdbcType="DECIMAL" />
+        <result column="oid" property="oid" jdbcType="VARCHAR" />
+        <result column="number" property="number" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="type" property="type" jdbcType="VARCHAR" />
+        <result column="version" property="version" jdbcType="VARCHAR" />
+        <result column="state" property="state" jdbcType="VARCHAR" />
+        <result column="modifyer" property="modifyer" jdbcType="VARCHAR" />
+        <result column="isauthen" property="isauthen" jdbcType="VARCHAR" />
+        <result column="authenpart" property="authenpart" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <select id="queryBasic" resultMap="BaseResultMap" parameterType="hbi.core.bom.dto.WncPart">
+        SELECT
+        bwp.WNC_PART_ID,
+        bwp.oid,
+        bwp.number,
+        bwp.`name`,
+        bwp.type,
+        bwp.version,
+        bwp.state,
+        bwp.modifyer,
+        bwp.isauthen,
+        bwp.authenpart,
+        bwp.OBJECT_VERSION_NUMBER
+        FROM
+        bom_wnc_part AS bwp
+        <where>
+            <if test="number!=null">
+                AND `number` regexp #{number}
+            </if>
+        </where>
+    </select>
+
+</mapper>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="hbi.core.bom.mapper.ReviseFailureMapper">
+    <resultMap id="BaseResultMap" type="hbi.core.bom.dto.ReviseFailure">
+        <result column="FAILURE_ID" property="failureId" jdbcType="DECIMAL" />
+        <result column="CHGINFO_ID" property="chginfoId" jdbcType="DECIMAL" />
+        <result column="REVISE_ID" property="reviseId" jdbcType="DECIMAL" />
+        <result column="oid" property="oid" jdbcType="VARCHAR" />
+        <result column="soid" property="soid" jdbcType="VARCHAR" />
+        <result column="number" property="number" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="type" property="type" jdbcType="VARCHAR" />
+        <result column="version" property="version" jdbcType="VARCHAR" />
+        <result column="descripton" property="descripton" jdbcType="VARCHAR" />
+    </resultMap>
+
+
+</mapper>
