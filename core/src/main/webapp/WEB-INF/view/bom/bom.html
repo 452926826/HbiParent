@@ -3,38 +3,147 @@
     var viewModel = kendo.observable({
         model: {},
         createFunction: function () {
-            $('#Grid').data('kendoGrid').addRow();
+            $('#Grid').data('kendoTreeList').addRow();
         },
         saveFunction: function () {
-            $('#Grid').data('kendoGrid').saveChanges();
+            $('#Grid').data('kendoTreeList').saveRow();
+        },
+        deleteFunction:function(e)
+        {
+            for( var i=0;i<selectedDataItems.length;i++)
+            {
+                $('#Grid').data('kendoTreeList').removeRow(selectedDataItems[i]);
+            }
         },
         queryResource: function (e) {
-            $('#Grid').data('kendoGrid').dataSource.page(1);
+            $('#Grid').data('kendoTreeList').dataSource.page(1);
+        },
+        resetForm: function (e) {
+            e.preventDefault();
+            var formData = viewModel.model.toJSON();
+            for (k in formData) {
+                viewModel.model.set(k, null);
+            }
+        }, cancelFunction: function () {
+            $("#Grid").data("kendoTreeList")._cancelEdit();
         }
     });
 </script>
 <body>
+<form id="base_info_form" class="modal-content form-horizontal" role="form" >
+    <div class="col-xs-offset-1"><div class="form-group">
+        <div class="col-xs-5" style="text-align: center">
+            <span id="title"></span>
+        </div>
+    </div>
+        <div class="form-group">
+            <label class="col-xs-2 control-label">名称</label>
+            <div class="col-xs-3">
+                <input id="name" type="text"  style='border-left:0px;border-top:0px;border-right:0px;' readonly="true" >
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-2 control-label">状态</label>
+            <div class="col-xs-3">
+                <input id="status" type="text"  style='border-left:0px;border-top:0px;border-right:0px; ' readonly="true" >
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-2 control-label">状况</label>
+            <div class="col-xs-3">
+                <input id="state" type="text"  style='border-left:0px;border-top:0px;border-right:0px; ' readonly="true" >
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-2 control-label">修改者</label>
+            <div class="col-xs-3">
+                <input id="modifyer" type="text"  style='border-left:0px;border-top:0px;border-right:0px; ' readonly="true" >
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-2 control-label">位置</label>
+            <div class="col-xs-3">
+                <input id="location" type="text"  style='border-left:0px;border-top:0px;border-right:0px; ' readonly="true" >
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-2 control-label">成品</label>
+            <div class="col-xs-3">
+                <input id="is" type="text"  style='border-left:0px;border-top:0px;border-right:0px;' readonly="true"  value="是">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-2 control-label">默认跟踪代码</label>
+            <div class="col-xs-3">
+                <input id="value1" type="text"  style='border-left:0px;border-top:0px;border-right:0px;' readonly="true" value="序列号">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-2 control-label">产品生命周期状态</label>
+            <div class="col-xs-3">
+                <input id="value2" type="text"  style='border-left:0px;border-top:0px;border-right:0px; ' readonly="true" >
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-2 control-label">是否认证产品</label>
+            <div class="col-xs-3">
+                <input id="value3" type="text"  style='border-left:0px;border-top:0px;border-right:0px;' readonly="true" >
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-2 control-label"></label>
+            <div class="col-xs-3">
+                <a href="javascript:;" onclick="showTree()">更多信息</a>
+            </div>
+        </div>
+    </div>
+</form>
 <div id="page-content">
     <div class="pull-left" id="toolbar-btn" style="padding-bottom:10px;">
         <span class="btn btn-primary k-grid-add" style="float:left;margin-right:5px;" data-bind="click:createFunction"><@spring.message "hap.new"/></span>
         <span class="btn btn-success k-grid-save-changes" data-bind="click:saveFunction" style="float:left;margin-right:5px;"><@spring.message "hap.save"/></span>
-        <span onclick="deleteData()" class="btn btn-danger" style="float:left;"><@spring.message "hap.delete"/></span>
+        <span  class="btn btn-danger" style="float:left;" data-bind="click:deleteFunction" ><@spring.message "hap.delete"/></span>
+        <span style="float:left;" class="btn btn-default "
+              data-bind="click:cancelFunction"><@spring.message "hap.cancel"/></span>
     </div>
-    <script>kendo.bind($('#toolbar-btn'), viewModel);</script>
     <div class="pull-right" id="query-form" style="padding-bottom:10px;">
         <span class="btn btn-primary" style="float:left;width:70px" data-bind="click:queryResource" type="submit"><@spring.message "hap.query"/></span>
         <div style="clear:both"></div>
     </div>
-    <script>kendo.bind($('#query-form'), viewModel);</script>
-    <div style="clear:both">
+    <div id="div"style="clear:both">
         <div id="Grid"></div>
     </div>
 </div>
 
 <script type="text/javascript">
-
+    kendo.bind($('#page-content'), viewModel);
+    var ida2a2='${RequestParameters.ida2a2}';
+    var name='${RequestParameters.name}';
+    var state='${RequestParameters.state}';
+    var status='${RequestParameters.status}';
+    var modifyer='${RequestParameters.modifyer}';
+    var number='${RequestParameters.number}';
+    var version='${RequestParameters.version}';
+    var modtime='${RequestParameters.modtime}';
+    $("#name").val(name);
+    $("#state").val(state);
+    $("#status").val(status);
+    $("#modifyer").val(modifyer +"于"+ modtime+" 修改");
+    document.getElementById("title").innerText="产品-"+ida2a2+","+version+","+number;
+    //$("#div").hide();
+    function showTree()
+    {
+        if($("#div").is(":hidden"))
+        {
+            $("#div").show();
+        }else
+        {
+            $("#div").hide();
+        }
+    }
     var BaseUrl = _basePath;
-    dataSource = new kendo.data.DataSource({
+    var selectedDataItems = [];
+    dataSource = new kendo.data.TreeListDataSource({
         transport: {
             read: {
                 url: BaseUrl + "/bom/bom/query",
@@ -73,18 +182,27 @@
             total: 'total',
             model: {
                 id: "bomId",
+                parentId:"id",
+                expanded: true,
                 fields: {}
             }
         }
     });
-
-    $("#Grid").kendoGrid({
+    console.log(dataSource)
+    $("#Grid").kendoTreeList({
         dataSource: dataSource,
-        height: '100%',
         resizable: true,
         scrollable: true,
-        navigatable: false,
+        editable:true,
         selectable: 'multiple, rowbox',
+        change: function(e) {
+            var selectedRows = this.select();
+            for (var i = 0; i < selectedRows.length; i++) {
+                var dataItem = this.dataItem(selectedRows[i]);
+                selectedDataItems.push(dataItem);
+            }
+            // selectedDataItems contains all selected data items
+        },
         pageable: {
             pageSizes: [5, 10, 20, 50],
             refresh: true,
@@ -92,209 +210,92 @@
         },
         columns: [
             {
-                field: "bomId",
-                title: '<@spring.message "Bom.bomId"/>',
+                field: "childnum",
+                title: '编码',
                 width: 120
             },
                     {
-                field: "ida2a2",
-                title: '<@spring.message "Bom.ida2a2"/>',
+                title: '不推荐',
                 width: 120
             },
                     {
-                field: "linkida2a2",
-                title: '<@spring.message "Bom.linkida2a2"/>',
+                title: '物料综合等级',
                 width: 120
             },
-                    {
-                field: "childmasterida2a2",
-                title: '<@spring.message "Bom.childmasterida2a2"/>',
+            {
+                field: "childname",
+                title: '名称',
                 width: 120
             },
-                    {
-                field: "id",
-                title: '<@spring.message "Bom.id"/>',
+            {
+                field: "specification",
+                title: '型号规格',
                 width: 120
             },
-                    {
-                field: "parentid",
-                title: '<@spring.message "Bom.parentid"/>',
-                width: 120
-            },
-                    {
-                field: "state",
-                title: '<@spring.message "Bom.state"/>',
-                width: 120
-            },
-                    {
-                field: "total",
-                title: '<@spring.message "Bom.total"/>',
+            {
+                field: "version",
+                title: '版本',
                 width: 120
             },
                     {
                 field: "linenum",
-                title: '<@spring.message "Bom.linenum"/>',
+                title: '行号',
                 width: 120
             },
                     {
                 field: "occurrence",
-                title: '<@spring.message "Bom.occurrence"/>',
+                title: '位号',
                 width: 120
             },
                     {
                 field: "amount",
-                title: '<@spring.message "Bom.amount"/>',
+                title: '数量',
                 width: 120
             },
                     {
                 field: "unit",
-                title: '<@spring.message "Bom.unit"/>',
-                width: 120
-            },
-                    {
-                field: "childnum",
-                title: '<@spring.message "Bom.childnum"/>',
-                width: 120
-            },
-                    {
-                field: "childname",
-                title: '<@spring.message "Bom.childname"/>',
-                width: 120
-            },
-                    {
-                field: "partstate",
-                title: '<@spring.message "Bom.partstate"/>',
-                width: 120
-            },
-                    {
-                field: "status",
-                title: '<@spring.message "Bom.status"/>',
-                width: 120
-            },
-                    {
-                field: "version",
-                title: '<@spring.message "Bom.version"/>',
+                title: '默认单位',
                 width: 120
             },
                     {
                 field: "linkweight",
-                title: '<@spring.message "Bom.linkweight"/>',
+                title: '重量',
                 width: 120
             },
                     {
                 field: "source",
-                title: '<@spring.message "Bom.source"/>',
-                width: 120
-            },
-                    {
-                field: "isvirtual",
-                title: '<@spring.message "Bom.isvirtual"/>',
-                width: 120
-            },
-                    {
-                field: "priory",
-                title: '<@spring.message "Bom.priory"/>',
-                width: 120
-            },
-                    {
-                field: "isboard",
-                title: '<@spring.message "Bom.isboard"/>',
-                width: 120
-            },
-                    {
-                field: "replacement",
-                title: '<@spring.message "Bom.replacement"/>',
+                title: '关系来源',
                 width: 120
             },
                     {
                 field: "isborrow",
-                title: '<@spring.message "Bom.isborrow"/>',
-                width: 120
-            },
-                    {
-                field: "iskey",
-                title: '<@spring.message "Bom.iskey"/>',
-                width: 120
-            },
-                    {
-                field: "discription",
-                title: '<@spring.message "Bom.discription"/>',
-                width: 120
-            },
-                    {
-                field: "isselected",
-                title: '<@spring.message "Bom.isselected"/>',
-                width: 120
-            },
-                    {
-                field: "view",
-                title: '<@spring.message "Bom.view"/>',
-                width: 120
-            },
-                    {
-                field: "material",
-                title: '<@spring.message "Bom.material"/>',
-                width: 120
-            },
-                    {
-                field: "producttype",
-                title: '<@spring.message "Bom.producttype"/>',
-                width: 120
-            },
-                    {
-                field: "classification",
-                title: '<@spring.message "Bom.classification"/>',
-                width: 120
-            },
-                    {
-                field: "sapversion",
-                title: '<@spring.message "Bom.sapversion"/>',
+                title: '是否借用',
                 width: 120
             },
                     {
                 field: "drawingsize",
-                title: '<@spring.message "Bom.drawingsize"/>',
+                title: '图幅',
                 width: 120
             },
                     {
                 field: "cadtype",
-                title: '<@spring.message "Bom.cadtype"/>',
+                title: '图纸类型',
                 width: 120
             },
                     {
                 field: "drawingtype",
-                title: '<@spring.message "Bom.drawingtype"/>',
+                title: '图样类型',
                 width: 120
             },
-                    {
-                field: "specification",
-                title: '<@spring.message "Bom.specification"/>',
-                width: 120
-            },
-                    {
-                field: "marlevel",
-                title: '<@spring.message "Bom.marlevel"/>',
-                width: 120
-            },
-                    {
-                field: "weight",
-                title: '<@spring.message "Bom.weight"/>',
-                width: 120
-            },
+            {
+                title: "Edit", command: ["edit", "destroy"], width: 250,
+                attributes: {
+                    style: "text-align: center;"
+                }
+            }
         ],
         editable: true
     });
-
-    function deleteData() {
-
-        Hap.deleteGridSelection({
-            grid: $('#Grid')
-        });
-
-    }
-
-    Hap.autoResizeGrid("#Grid");
-
 
 </script>
 </body>

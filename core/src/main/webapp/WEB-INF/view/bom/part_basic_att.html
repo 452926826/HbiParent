@@ -28,6 +28,7 @@
     <script>kendo.bind($('#query-form'), viewModel);</script>
     <div style="clear:both">
         <div id="Grid"></div>
+        <div id="detaildialog"></div>
     </div>
 </div>
 
@@ -91,11 +92,6 @@
             buttonCount: 5
         },
         columns: [
-            {
-                field: "basicAttId",
-                title: '<@spring.message "PartBasicAtt.basicAttId"/>',
-                width: 120
-            },
                     {
                 field: "ida2a2",
                 title: '<@spring.message "PartBasicAtt.ida2a2"/>',
@@ -155,11 +151,36 @@
                 field: "container",
                 title: '<@spring.message "PartBasicAtt.container"/>',
                 width: 120
-            },
+            },    {
+                title: '编辑',
+                width: 120,
+                template:function(dataItem)
+                {
+                    var ids=JSON.stringify(dataItem).replace(/\"/g,"\'");
+                    return '<a href="javascript:void(0);" onclick=getDetail('+ids+')>查看详情</a>';
+                }
+            }
         ],
         editable: true
     });
-
+    function getDetail(item)
+    {
+        var dialog = $("#detaildialog")
+            .kendoWindow(
+                {
+                    actions : [ "Close" ],
+                    width: 920,
+                    height: 450,
+                    modal: true,
+                    title: item.ida2a2+'-详细信息',
+                    visible: false,
+                    iframe: true,
+                    content: 'bom.html?ida2a2='+item.ida2a2+'&name='+item.name+
+                        '&state='+item.state+'&status='+item.status+'&modifyer='+item.modifyer+
+                        '&number='+item.number+"&version="+item.version+"&modtime="+item.modtime
+                }).data("kendoWindow");
+        dialog.maximize().open();
+    }
     function deleteData() {
 
         Hap.deleteGridSelection({

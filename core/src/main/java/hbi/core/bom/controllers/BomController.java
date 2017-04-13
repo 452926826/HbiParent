@@ -26,6 +26,7 @@ import java.util.List;
     public ResponseData query(Bom dto, @RequestParam(defaultValue = DEFAULT_PAGE) int page,
         @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int pageSize, HttpServletRequest request) {
         IRequest requestContext = createRequestContext(request);
+        System.out.println(service.select(requestContext,dto,page,pageSize).get(0));
         return new ResponseData(service.select(requestContext,dto,page,pageSize));
     }
 
