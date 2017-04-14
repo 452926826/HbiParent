@@ -57,6 +57,27 @@
     var chginfoId = '${RequestParameters.chginfoId!0}';
     var copyObj = {};
     var addObjectStr = "";
+
+    //是否
+    var yesNoDataSource = [
+        {"value":"是"},
+        {"value":"否"}
+    ];
+
+    var selectDataSource = [
+        {"value":"报废"},
+        {"value":"按图改制"},
+        {"value":"不处理，用完为止"},
+        {"value":"按备注说明执行"}
+    ];
+
+    var selectDataSource2 = [
+        {"value":"无需变更"},
+        {"value":"重新下发"}
+    ];
+
+
+
     if (chginfoId!=0){
         //更新
         //获取主数据
@@ -83,47 +104,57 @@
         //保存方法
         saveFunction:function (e) {
             e.preventDefault();
-            if(chginfoId!=0){
-                //更新
-                chginfo_viewModel.model.set("__status","update");
-                Hap.submitForm({
-                    url: '${base.contextPath}/bom/chginfo/submit',
-                    formModel: chginfo_viewModel.model,
-                    success: function (json){
-                        if(json.success){
-                            kendo.ui.showInfoDialog({
-                                message: "成功"
-                            });
-                        }else{
-                            kendo.ui.showErrorDialog({
-                                message: "失败"
-                            });
-                        }
-                    }
+            var dataModel = chginfo_viewModel.model;
+            var flag = dataModel.name==null||dataModel.processor==null||dataModel.inworksol==null||dataModel.softwaresol==null||dataModel.stocksol==null||dataModel.testsol==null;
+            if(flag){
+                kendo.ui.showWarningDialog({
+                    message:"请将信息填写完整"
                 });
             }else {
-                //新建
-                chginfo_viewModel.model.set("__status","add");
-                Hap.submitForm({
-                    url: '${base.contextPath}/bom/chginfo/submit',
-                    formModel: chginfo_viewModel.model,
-                    success: function (data){
-                        if(data.success){
-                            kendo.ui.showInfoDialog({
-                                message: "成功"
-                            }).done(function () {
-                                var chginfoId = data.rows[0].chginfoId;
-                                parent.openTab('BOM_UPDATE'+chginfoId,'更新变更任务', '${base.contextPath}/bom/change/chginfo_detail.html?chginfoId='+chginfoId);
-                                parent.closeTab('BOM_CHANGE_CREATE');
-                            });
-                        }else {
-                            kendo.ui.showErrorDialog({
-                                message: data.message
-                            });
+                if(chginfoId!=0){
+                    //更新
+                    chginfo_viewModel.model.set("__status","update");
+                    Hap.submitForm({
+                        url: '${base.contextPath}/bom/chginfo/submit',
+                        formModel: chginfo_viewModel.model,
+                        success: function (json){
+                            if(json.success){
+                                kendo.ui.showInfoDialog({
+                                    message: "成功"
+                                });
+                            }else{
+                                kendo.ui.showErrorDialog({
+                                    message: "失败"
+                                });
+                            }
                         }
-                    }
-                });
+                    });
+                }else {
+                    //新建
+                    chginfo_viewModel.model.set("__status","add");
+                    Hap.submitForm({
+                        url: '${base.contextPath}/bom/chginfo/submit',
+                        formModel: chginfo_viewModel.model,
+                        success: function (data){
+                            if(data.success){
+                                kendo.ui.showInfoDialog({
+                                    message: "成功"
+                                }).done(function () {
+                                    var chginfoId = data.rows[0].chginfoId;
+                                    parent.openTab('BOM_UPDATE'+chginfoId,'更新变更任务', '${base.contextPath}/bom/change/chginfo_detail.html?chginfoId='+chginfoId);
+                                    parent.closeTab('BOM_CHANGE_CREATE');
+                                });
+                            }else {
+                                kendo.ui.showErrorDialog({
+                                    message: data.message
+                                });
+                            }
+                        }
+                    });
+                }
             }
+
+
         },
         //复制通用意见到受影响对象中方法
         copyFunction:function (e) {
@@ -172,7 +203,7 @@
         }
     });
 
-    //添加受影响的对象viewModel
+    //产生对象viewModel
     var reviseObject_viewModel = kendo.observable({
         model: {
         },
@@ -246,7 +277,7 @@
                     <label for="info-processor" class="col-sm-3 control-label">工作负责人：</label>
                     <div class="col-sm-9">
                         <input type="text" data-bind="value:model.processor" id="info-processor"
-                               style="width:76%;float: left;" class="k-textbox">
+                               style="width:76%;float: left;" class="k-textbox" readonly>
                         <span class="btn btn-default" id="show-user-dialog"
                               style="width:24%;float: left;">搜索用户</span>
                     </div>
@@ -433,16 +464,14 @@
 <#include "show_keypart.html">
 <!-- 导入导出的excel Window -->
 <div id="excelWindow"></div>
+<!-- 导入导出的excel Window--产生对象 -->
+<div id="excelWindow_revise"></div>
 
 <script>
     var BaseUrl = _basePath;
 
-    var selectDataSource = [
-        {"value":"报废"},
-        {"value":"按图改制"},
-        {"value":"不处理，用完为止"},
-        {"value":"按备注说明执行"}
-        ];
+
+
 
     //绑定viewModel
     kendo.bind($('#basic-info'), chginfo_viewModel);
@@ -481,9 +510,7 @@
         valuePrimitive: true,
         dataTextField : "value",
         dataValueField : "value",
-        dataSource : [
-            {"value":"无需变更"},
-            {"value":"重新下发"}]
+        dataSource : selectDataSource2
     });
 
     //基本信息收缩展开
@@ -636,6 +663,17 @@
                 headerAttributes: {
                     "class": "table-header-cell",
                     style: "text-align: center;color:#f00;"
+                },
+                editor: function (container, options) {
+                    $('<input name="' + options.field + '"/>')
+                        .appendTo(container)
+                        .kendoDropDownList({
+                            filter: "contains",
+                            valuePrimitive: true,
+                            dataTextField : "value",
+                            dataValueField : "value",
+                            dataSource : selectDataSource
+                        });
                 }
             },
             {
@@ -646,6 +684,17 @@
                 headerAttributes: {
                     "class": "table-header-cell",
                     style: "text-align: center;color:#f00;"
+                },
+                editor: function (container, options) {
+                    $('<input name="' + options.field + '"/>')
+                        .appendTo(container)
+                        .kendoDropDownList({
+                            filter: "contains",
+                            valuePrimitive: true,
+                            dataTextField : "value",
+                            dataValueField : "value",
+                            dataSource : selectDataSource
+                        });
                 }
             },
             {
@@ -656,6 +705,17 @@
                 headerAttributes: {
                     "class": "table-header-cell",
                     style: "text-align: center;color:#f00;"
+                },
+                editor: function (container, options) {
+                    $('<input name="' + options.field + '"/>')
+                        .appendTo(container)
+                        .kendoDropDownList({
+                            filter: "contains",
+                            valuePrimitive: true,
+                            dataTextField : "value",
+                            dataValueField : "value",
+                            dataSource : selectDataSource2
+                        });
                 }
             },
             {
@@ -666,6 +726,17 @@
                 headerAttributes: {
                     "class": "table-header-cell",
                     style: "text-align: center;color:#f00;"
+                },
+                editor: function (container, options) {
+                    $('<input name="' + options.field + '"/>')
+                        .appendTo(container)
+                        .kendoDropDownList({
+                            filter: "contains",
+                            valuePrimitive: true,
+                            dataTextField : "value",
+                            dataValueField : "value",
+                            dataSource : selectDataSource2
+                        });
                 }
             },
             {
@@ -676,6 +747,17 @@
                 headerAttributes: {
                     "class": "table-header-cell",
                     style: "text-align: center;color:#f00;"
+                },
+                editor: function (container, options) {
+                    $('<input name="' + options.field + '"/>')
+                        .appendTo(container)
+                        .kendoDropDownList({
+                            filter: "contains",
+                            valuePrimitive: true,
+                            dataTextField : "value",
+                            dataValueField : "value",
+                            dataSource : yesNoDataSource
+                        });
                 }
             },
             {
@@ -774,7 +856,7 @@
     //导入excel窗口初始化
     window.excelWindow = function(){
         var excelWindow = $("#excelWindow").kendoWindow({
-            title: '描述维护的导入',
+            title: '受影响对象的导入',
             content:"${base.contextPath}/bom/change/import_excel.html?chginfoId="+chginfoId,
             actions: [
                 "Pin",
@@ -1011,11 +1093,39 @@
         editable: true
     });
 
+    //导入excel窗口初始化
+    window.excelWindow_revise= function(){
+        var excelWindow = $("#excelWindow_revise").kendoWindow({
+            title: '产生对象的导入',
+            content:"${base.contextPath}/bom/change/import_excel_revise.html?chginfoId="+chginfoId,
+            actions: [
+                "Pin",
+                "Close"
+            ],
+            modal:true,
+            visible:false,
+            iframe:true,
+            close: function() {
+                //window 关闭  刷新 本页面的  Grid
+                $('#reviseObject-Grid').data('kendoGrid').dataSource.page(1);
+            }
+        }).data("kendoWindow");
+        excelWindow.center().open();
+        //最大化
+        excelWindow.toggleMaximization();
+    }
+
     //导出excel
     $("#reviseObject-excel-out-btn").click(function(e) {
         e.preventDefault();
         var grid = $("#reviseObject-Grid").data("kendoGrid");
         grid.saveAsExcel();
+    });
+
+    //导入excel
+    $("#reviseObject-excel-in-btn").click(function(e) {
+        e.preventDefault();
+        excelWindow_revise();
     });
 
     //产生对象收缩展开
