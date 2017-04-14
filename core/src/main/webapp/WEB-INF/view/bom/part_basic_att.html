@@ -168,6 +168,8 @@
     });
     function getDetail(item)
     {
+        $('#Grid').data('kendoGrid').dataSource.page(1);
+        var title = item.ida2a2+'-详细信息';
         var dialog = $("#detaildialog")
             .kendoWindow(
                 {
@@ -175,13 +177,12 @@
                     width: 920,
                     height: 450,
                     modal: true,
-                    title: item.ida2a2+'-详细信息',
                     visible: false,
                     iframe: true,
                     content: 'employees.html?ida2a2='+item.ida2a2+'&name='+item.name+
                         '&state='+item.state+'&status='+item.status+'&modifyer='+item.modifyer+
                         '&number='+item.number+"&version="+item.version+"&modtime="+item.modtime
-                }).data("kendoWindow");
+                }).data("kendoWindow").title(title);
         dialog.maximize().open();
     }
     function deleteData() {

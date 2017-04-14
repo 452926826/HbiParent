@@ -1,4 +1,34 @@
 <#include "../include/header.html">
+<style>
+    .bg-bar{
+        position: relative;
+        background: #f9f9f9;
+        height: 30px;
+        line-height: 30px;
+        border-bottom: 1px solid #ccc;
+    }
+    .bar-left{
+        padding-left: 10px;
+    }
+    .panel{
+        margin-bottom: 0;
+    }
+    .panel>.row{
+        margin: 10px auto;
+    }
+    .bar-btn{
+        position: absolute;
+        text-align: center;
+        right: 10px;
+        top:5px;
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+    .bar-btn>span{
+        font-size:22px;
+    }
+</style>
 <script type="text/javascript">
     var viewModel = kendo.observable({
         model: {},
@@ -66,12 +96,19 @@
     });
 </script>
 <body>
-<form id="base_info_form" class="modal-content form-horizontal" role="form" >
-    <div class="col-xs-offset-1"><div class="form-group">
-        <div class="col-xs-5" style="text-align: center">
-            <span id="title"></span>
+<form id="base_info_form" class="modal-content form-horizontal" role="form">
+    <div class="bg-bar">
+        <span class="bar-left">基本信息</span>
+        <div class="bar-btn">
+            <span class="fa fa-angle-double-up"></span>
         </div>
     </div>
+    <div class="col-xs-offset-1">
+        <div class="form-group">
+            <div class="col-xs-5" style="text-align: center">
+                <span id="title"></span>
+            </div>
+        </div>
         <div class="form-group">
             <label class="col-xs-2 control-label">名称</label>
             <div class="col-xs-3">
@@ -155,7 +192,7 @@
                 style="margin-right:3px;"></i><@spring.message "hap.reset"/></span>
     </div>
     <div  style="clear:both">
-        <div id="Grid"></div>
+        <div id="Grid" style="margin-bottom: 30px;"></div>
     </div>
     <div id="dialog"></div>
 </div>
@@ -257,13 +294,14 @@
     var tree=$("#Grid").kendoTreeList({
         dataSource: dataSource,
         //toolbar: [ "create"],
-        /*columnMenu: true,
+        columnMenu: true,
         reorderable:true,
         resizable: true,
         scrollable: true,
         navigatable: false,
-        editable:true,*/
+        editable:true,
         selectable:'row',
+        height:"300px",
         change: function(e) {
             var selectedRows = this.select();
             for (var i = 0; i < selectedRows.length; i++) {
@@ -381,7 +419,13 @@
 
     //
 
-
+    //产生对象收缩展开
+    $("#base_info_form").on("click",".bar-btn",function (e) {
+        e.preventDefault();
+        var classStr = $(this).find("span").attr("class")=='fa fa-angle-double-up'?'fa fa-angle-double-down':'fa fa-angle-double-up';
+        $(this).find("span").removeClass().addClass(classStr);
+        $("#base_info_form").find(".col-xs-offset-1").toggle(0);
+    });
 
 
 
