@@ -21,7 +21,6 @@ public class Bom extends BaseDTO {
 
       private String id;
 
-      private String parentid;
 
       private String state;
 
@@ -87,8 +86,18 @@ public class Bom extends BaseDTO {
 
       private String weight;
 
+      private Long demoid;
 
-     public void setBomId(Long bomId){
+    public Long getDemoid() {
+        return demoid;
+    }
+
+    public Bom setDemoid(Long demoid) {
+        this.demoid = demoid;
+        return this;
+    }
+
+    public void setBomId(Long bomId){
          this.bomId = bomId;
      }
 
@@ -126,14 +135,6 @@ public class Bom extends BaseDTO {
 
      public String getId(){
          return id;
-     }
-
-     public void setParentid(String parentid){
-         this.parentid = parentid;
-     }
-
-     public String getParentid(){
-         return parentid;
      }
 
      public void setState(String state){

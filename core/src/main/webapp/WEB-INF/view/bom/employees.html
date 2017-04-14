@@ -99,24 +99,31 @@
     </div>
 </form>
 <div id="page-content">
+    <div class="panel">
+        <script>kendo.bind($('#query-form'), viewModel);</script>
+        <div class="panel-footer text-right">
+                        <span class="btn btn-primary" style="width:70px" data-bind="click:queryResource"
+                              type="submit"><i class="fa fa-search" style="margin-right:3px;"></i><@spring.message "hap.query"/></span>
+            <span class="btn btn-default" style="width:70px" data-bind="click:resetForm" type="button"><i
+                    class="fa fa-refresh"
+                    style="margin-right:3px;"></i><@spring.message "hap.reset"/></span>
+        </div>
+    </div>
     <div class="pull-left" id="toolbar-btn" style="padding-bottom:10px;">
         <span class="btn btn-primary k-grid-add" style="float:left;margin-right:5px;" data-bind="click:createFunction"><@spring.message "hap.new"/></span>
         <span class="btn btn-success k-grid-save-changes" data-bind="click:saveFunction" style="float:left;margin-right:5px;"><@spring.message "hap.save"/></span>
         <span  class="btn btn-danger" style="float:left;" data-bind="click:deleteFunction" ><@spring.message "hap.delete"/></span>
         <span style="float:left;" class="btn btn-default "
-              data-bind="click:cancelFunction"><@spring.message "hap.cancel"/></span>
+              data-bind="click:cancelFunction"><i class="fa fa-reply"
+                                                  style="margin-right:3px;"></i><@spring.message "hap.cancel"/></span>
     </div>
-    <div class="pull-right" id="query-form" style="padding-bottom:10px;">
-        <span class="btn btn-primary" style="float:left;width:70px" data-bind="click:queryResource" type="submit"><@spring.message "hap.query"/></span>
-        <div style="clear:both"></div>
-    </div>
-    <div id="div"style="clear:both">
+    <div  style="clear:both">
         <div id="Grid"></div>
     </div>
+    <div id="dialog"></div>
 </div>
 
 <script type="text/javascript">
-    kendo.bind($('#page-content'), viewModel);
     var ida2a2='${RequestParameters.ida2a2}';
     var name='${RequestParameters.name}';
     var state='${RequestParameters.state}';
@@ -130,38 +137,39 @@
     $("#status").val(status);
     $("#modifyer").val(modifyer +"于"+ modtime+" 修改");
     document.getElementById("title").innerText="产品-"+ida2a2+","+version+","+number;
-    //$("#div").hide();
+    $("#page-content").hide();
     function showTree()
     {
-        if($("#div").is(":hidden"))
+        if($("#page-content").is(":hidden"))
         {
-            $("#div").show();
+            $("#page-content").show();
         }else
         {
-            $("#div").hide();
+            $("#page-content").hide();
         }
     }
+    kendo.bind($('#page-content'), viewModel);
     var BaseUrl = _basePath;
     var selectedDataItems = [];
     dataSource = new kendo.data.TreeListDataSource({
         transport: {
             read: {
-                url: BaseUrl + "/bom/bom/query",
+                url: BaseUrl + "/hap/employees/query",
                 type: "POST",
                 dataType: "json"
             },
             update: {
-                url: BaseUrl + "/bom/bom/submit",
+                url: BaseUrl + "/hap/employees/submit",
                 type: "POST",
                 contentType: "application/json"
             },
             destroy: {
-                url: BaseUrl + "/bom/bom/remove",
+                url: BaseUrl + "/hap/employees/remove",
                 type: "POST",
                 contentType: "application/json"
             },
             create: {
-                url: BaseUrl + "/bom/bom/submit",
+                url: BaseUrl + "/hap/employees/submit",
                 type: "POST",
                 contentType: "application/json"
             },
@@ -181,20 +189,23 @@
             data: 'rows',
             total: 'total',
             model: {
-                id: "bomId",
-                parentId:"demoid",
+                id: "employeeId",
                 expanded: true,
-                fields: {}
+                fields: {
+                    bornDate:{type:"date"}
+                }
             }
         }
     });
-    console.log(dataSource)
+console.log(dataSource)
     $("#Grid").kendoTreeList({
         dataSource: dataSource,
+        //toolbar: [ "create"],
         resizable: true,
         scrollable: true,
+        //navigatable: false,
         editable:true,
-        selectable: 'multiple, rowbox',
+        selectable: "multiple, row",
         change: function(e) {
             var selectedRows = this.select();
             for (var i = 0; i < selectedRows.length; i++) {
@@ -209,16 +220,21 @@
             buttonCount: 5
         },
         columns: [
+                    {
+                field: "name",
+                title: '姓名',
+                width: 120
+            },
             {
                 field: "childnum",
                 title: '编码',
                 width: 120
             },
-                    {
+            {
                 title: '不推荐',
                 width: 120
             },
-                    {
+            {
                 title: '物料综合等级',
                 width: 120
             },
@@ -237,52 +253,52 @@
                 title: '版本',
                 width: 120
             },
-                    {
+            {
                 field: "linenum",
                 title: '行号',
                 width: 120
             },
-                    {
+            {
                 field: "occurrence",
                 title: '位号',
                 width: 120
             },
-                    {
+            {
                 field: "amount",
                 title: '数量',
                 width: 120
             },
-                    {
+            {
                 field: "unit",
                 title: '默认单位',
                 width: 120
             },
-                    {
+            {
                 field: "linkweight",
                 title: '重量',
                 width: 120
             },
-                    {
+            {
                 field: "source",
                 title: '关系来源',
                 width: 120
             },
-                    {
+            {
                 field: "isborrow",
                 title: '是否借用',
                 width: 120
             },
-                    {
+            {
                 field: "drawingsize",
                 title: '图幅',
                 width: 120
             },
-                    {
+            {
                 field: "cadtype",
                 title: '图纸类型',
                 width: 120
             },
-                    {
+            {
                 field: "drawingtype",
                 title: '图样类型',
                 width: 120
@@ -293,9 +309,46 @@
                     style: "text-align: center;"
                 }
             }
-        ],
-        editable: true
+        ]
     });
+    function changeParent(id)
+    {
+        var dialog = $("#dialog").kendoWindow({
+            actions: ["Close"],
+//            animation: {
+//                close: {
+//                    effects: "fadeOut zoom:out",
+//                    duration: 300
+//                },
+//                open: {
+//                    effects: "fadeIn zoom:in",
+//                    duration: 300
+//                }
+//            },
+            width: 400,
+            height: 450,
+            title: '选择父节点',
+            visible: false,
+            iframe: true,
+            modal: true,
+            close:function()
+            {
+                $('#Grid').data('kendoTreeList').dataSource.page(1);
+            },
+            content: 'employees_parent.html?id=' + id
+        }).data("kendoWindow");
+        dialog.center().open();
+    }
+    function deleteData() {
+
+      //  Hap.deleteGridSelection({
+        //    grid: $('#Grid')
+       // });
+
+    }
+
+    Hap.autoResizeGrid("#Grid");
+
 
 </script>
 </body>

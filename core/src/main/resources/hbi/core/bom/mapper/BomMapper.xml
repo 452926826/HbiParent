@@ -4,11 +4,11 @@
 <mapper namespace="hbi.core.bom.mapper.BomMapper">
     <resultMap id="BaseResultMap" type="hbi.core.bom.dto.Bom">
         <result column="BOM_ID" property="bomId" jdbcType="DECIMAL" />
+        <result column="demoid" property="demoid" jdbcType="DECIMAL" />
         <result column="ida2a2" property="ida2a2" jdbcType="VARCHAR" />
         <result column="linkida2a2" property="linkida2a2" jdbcType="VARCHAR" />
         <result column="childmasterida2a2" property="childmasterida2a2" jdbcType="VARCHAR" />
         <result column="id" property="id" jdbcType="VARCHAR" />
-        <result column="parentid" property="parentid" jdbcType="VARCHAR" />
         <result column="state" property="state" jdbcType="VARCHAR" />
         <result column="total" property="total" jdbcType="VARCHAR" />
         <result column="linenum" property="linenum" jdbcType="VARCHAR" />
