@@ -26,27 +26,42 @@
             }
         }, cancelFunction: function () {
             $("#Grid").data("kendoTreeList")._cancelEdit();
-        },expandFunction:function()
-        {
-            /*   selectRow();
-             var checked = [];
-             for (var i in checkedIds) {
-             if (checkedIds[i] === true) {
-             checked
-             .push(grid.dataSource
-             .get(
-             i)
-             .toJSON());
-             }
-             }
-             checkedIds = {};*/
-            var treeList = $("#Grid").data("kendoTreeList");
+        },
 
-            for( var i=0;i<selectedDataItems.length;i++)
-            {
-                var row = treeList.content.find("tr[data-uid=" + selectedDataItems[i].uid + "]")
-                treeList.expand(row);
+
+        //展开
+        expandFunction:function(e) {
+           e.preventDefault();
+            var treeList = $("#Grid").data("kendoTreeList");
+            for (var i = 0;i<$("#Grid input[type=checkbox]:checked").length;i++){
+                var uid = $("#Grid input[type=checkbox]:checked").eq(i).attr("data-uid");
+                var row = treeList.content.find("tr[data-uid=" + uid+ "]");
+                treeList.expand(row)
             }
+        },
+        //收缩
+        compressFunction:function (e) {
+            e.preventDefault();
+            var treeList = $("#Grid").data("kendoTreeList");
+            for (var i = 0;i<$("#Grid input[type=checkbox]:checked").length;i++){
+                var uid = $("#Grid input[type=checkbox]:checked").eq(i).attr("data-uid");
+                var row = treeList.content.find("tr[data-uid=" + uid+ "]");
+                treeList.collapse(row);
+            }
+        },
+        //展开全部
+        expandAllFunction:function (e) {
+            e.preventDefault();
+            var treeList = $("#Grid").data("kendoTreeList"),
+                row = treeList.content.find("tr:visible").eq(0);
+            treeList.expand(row)
+        },
+        //收缩全部
+        compressAllFunction:function (e) {
+            e.preventDefault();
+            var treeList = $("#Grid").data("kendoTreeList"),
+                row = treeList.content.find("tr:visible").eq(0);
+            treeList.collapse(row)
         }
     });
 </script>
@@ -126,7 +141,11 @@
         <span  class="btn btn-danger" style="float:left;margin-right:5px;" data-bind="click:deleteFunction" ><@spring.message "hap.delete"/></span>
         <span style="float:left;margin-right:5px;" class="btn btn-default "
               data-bind="click:cancelFunction"><@spring.message "hap.cancel"/></span>
-        <span class="btn btn-success k-grid-save-changes" data-bind="click:expandFunction" style="float:left;margin-right:5px;">展开</span>
+        <span class="btn btn-success" data-bind="click:expandFunction" style="float:left;margin-right:5px;">展开</span>
+        <span class="btn btn-warning" data-bind="click:compressFunction" style="float:left;margin-right:5px;">收缩</span>
+
+        <span class="btn btn-success" data-bind="click:expandAllFunction" style="float:left;margin-right:5px;">展开全部</span>
+        <span class="btn btn-warning" data-bind="click:compressAllFunction" style="float:left;margin-right:5px;">收缩全部</span>
     </div>
     <div class="pull-right"  style="padding-bottom:10px;">
         <span class="btn btn-primary" style="width:70px" data-bind="click:queryResource"
@@ -238,13 +257,13 @@
     var tree=$("#Grid").kendoTreeList({
         dataSource: dataSource,
         //toolbar: [ "create"],
-        columnMenu: true,
+        /*columnMenu: true,
         reorderable:true,
         resizable: true,
         scrollable: true,
         navigatable: false,
-        editable:true,
-        selectable: "multiple, row",
+        editable:true,*/
+        selectable:'row',
         change: function(e) {
             var selectedRows = this.select();
             for (var i = 0; i < selectedRows.length; i++) {
@@ -253,22 +272,27 @@
             }
             // selectedDataItems contains all selected data items
         },
-        pageable: {
+        /*pageable: {
             pageSizes: [5, 10, 20, 50],
             refresh: true,
             buttonCount: 5
-        },
+        },*/
         columns: [
             {
-                title: '',
-                template: '<input class="checkbox" type="checkbox" style="margin-left: auto;margin-right: auto;text-align:center;"/>',
-                width: 30,
-                locked:true
+                template: function(dataItem){
+                    return "<input type='checkbox' name='check' data-uid="+dataItem.uid+"   />";
+                },
+                width: 60,
+                attributes: {
+                    "class": "table-header-cell",
+                    style: "text-align: center;"
+                }
             },
             {
                 field: "childnum",
                 title: '编码',
-                width: 120
+                width: 120,
+                expandable: true
             },
             {
                 title: '不推荐',
@@ -351,6 +375,27 @@
             }
         ]
     });
+
+
+
+
+    //
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     /*grid = $("#Grid").data("kendoTreeList");
     grid.table.on("click", ".checkbox", selectRow);*/
     function changeParent(id)
