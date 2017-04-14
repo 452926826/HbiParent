@@ -29,6 +29,15 @@ import java.util.List;
         return new ResponseData(service.select(requestContext,dto,page,pageSize));
     }
 
+
+    @RequestMapping(value = "/bom/revise/queryBasic")
+    @ResponseBody
+    public ResponseData queryBasic(Revise dto, @RequestParam(defaultValue = DEFAULT_PAGE) int page,
+                                   @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int pageSize, HttpServletRequest request) {
+        IRequest requestContext = createRequestContext(request);
+        return new ResponseData(service.queryBasic(requestContext,dto,page,pageSize));
+    }
+
     @RequestMapping(value = "/bom/revise/submit")
     @ResponseBody
     public ResponseData update(HttpServletRequest request,@RequestBody List<Revise> dto){
