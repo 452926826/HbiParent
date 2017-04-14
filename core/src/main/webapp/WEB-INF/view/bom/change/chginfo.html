@@ -350,7 +350,7 @@
         var userGrid = $("#user-grid").kendoGrid({
             dataSource: userDataSource,
             navigatable: false,
-            height: 300,
+            height: "270px",
             resizable: true,
             scrollable: true,
             selectable: 'rowbox',
@@ -402,7 +402,6 @@
         var win = $("#user-dialog").data("kendoWindow");
         win.modal = true;
         win.center().open();
-        Hap.autoResizeGrid("#user-grid");
     });
 
     /**
