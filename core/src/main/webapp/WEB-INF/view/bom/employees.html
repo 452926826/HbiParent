@@ -26,6 +26,27 @@
             }
         }, cancelFunction: function () {
             $("#Grid").data("kendoTreeList")._cancelEdit();
+        },expandFunction:function()
+        {
+            /*   selectRow();
+             var checked = [];
+             for (var i in checkedIds) {
+             if (checkedIds[i] === true) {
+             checked
+             .push(grid.dataSource
+             .get(
+             i)
+             .toJSON());
+             }
+             }
+             checkedIds = {};*/
+            var treeList = $("#Grid").data("kendoTreeList");
+
+            for( var i=0;i<selectedDataItems.length;i++)
+            {
+                var row = treeList.content.find("tr[data-uid=" + selectedDataItems[i].uid + "]")
+                treeList.expand(row);
+            }
         }
     });
 </script>
@@ -99,23 +120,20 @@
     </div>
 </form>
 <div id="page-content">
-    <div class="panel">
-        <script>kendo.bind($('#query-form'), viewModel);</script>
-        <div class="panel-footer text-right">
-                        <span class="btn btn-primary" style="width:70px" data-bind="click:queryResource"
-                              type="submit"><i class="fa fa-search" style="margin-right:3px;"></i><@spring.message "hap.query"/></span>
-            <span class="btn btn-default" style="width:70px" data-bind="click:resetForm" type="button"><i
-                    class="fa fa-refresh"
-                    style="margin-right:3px;"></i><@spring.message "hap.reset"/></span>
-        </div>
-    </div>
     <div class="pull-left" id="toolbar-btn" style="padding-bottom:10px;">
         <span class="btn btn-primary k-grid-add" style="float:left;margin-right:5px;" data-bind="click:createFunction"><@spring.message "hap.new"/></span>
         <span class="btn btn-success k-grid-save-changes" data-bind="click:saveFunction" style="float:left;margin-right:5px;"><@spring.message "hap.save"/></span>
-        <span  class="btn btn-danger" style="float:left;" data-bind="click:deleteFunction" ><@spring.message "hap.delete"/></span>
-        <span style="float:left;" class="btn btn-default "
-              data-bind="click:cancelFunction"><i class="fa fa-reply"
-                                                  style="margin-right:3px;"></i><@spring.message "hap.cancel"/></span>
+        <span  class="btn btn-danger" style="float:left;margin-right:5px;" data-bind="click:deleteFunction" ><@spring.message "hap.delete"/></span>
+        <span style="float:left;margin-right:5px;" class="btn btn-default "
+              data-bind="click:cancelFunction"><@spring.message "hap.cancel"/></span>
+        <span class="btn btn-success k-grid-save-changes" data-bind="click:expandFunction" style="float:left;margin-right:5px;">展开</span>
+    </div>
+    <div class="pull-right"  style="padding-bottom:10px;">
+        <span class="btn btn-primary" style="width:70px" data-bind="click:queryResource"
+              type="submit"><i class="fa fa-search" style="margin-right:3px;"></i><@spring.message "hap.query"/></span>
+        <span class="btn btn-default" style="width:70px" data-bind="click:resetForm" type="button"><i
+                class="fa fa-refresh"
+                style="margin-right:3px;"></i><@spring.message "hap.reset"/></span>
     </div>
     <div  style="clear:both">
         <div id="Grid"></div>
@@ -124,6 +142,37 @@
 </div>
 
 <script type="text/javascript">
+    var checkedIds = {};
+
+    //on click of the checkbox:
+    function selectRow() {
+        var checked = this.checked;
+        row = $(this).closest("tr");
+        grid = $("#Grid").data("kendoTreeList");
+        dataItem = grid.dataItem(row);
+        checkedIds[dataItem] = checked;
+        if (checked) {
+            //-select the row
+            row.addClass("k-state-selected");
+        } else {
+            //-remove selection
+            row.removeClass("k-state-selected");
+        }
+
+    }
+    //on dataBound event restore previous selected rows:
+    function onDataBound(e) {
+        var view = this.dataSource.view();
+        for (var i = 0; i < view.length; i++) {
+            if (checkedIds[view[i].id]) {
+                this.tbody.find("tr[data-uid='" + view[i].uid + "']")
+                    .addClass("k-state-selected").find(".checkbox")
+                    .attr("checked", "checked");
+            }
+        }
+    }
+
+
     var ida2a2='${RequestParameters.ida2a2}';
     var name='${RequestParameters.name}';
     var state='${RequestParameters.state}';
@@ -137,17 +186,6 @@
     $("#status").val(status);
     $("#modifyer").val(modifyer +"于"+ modtime+" 修改");
     document.getElementById("title").innerText="产品-"+ida2a2+","+version+","+number;
-    $("#page-content").hide();
-    function showTree()
-    {
-        if($("#page-content").is(":hidden"))
-        {
-            $("#page-content").show();
-        }else
-        {
-            $("#page-content").hide();
-        }
-    }
     kendo.bind($('#page-content'), viewModel);
     var BaseUrl = _basePath;
     var selectedDataItems = [];
@@ -190,20 +228,21 @@
             total: 'total',
             model: {
                 id: "employeeId",
-                expanded: true,
+                //expanded: true,
                 fields: {
                     bornDate:{type:"date"}
                 }
             }
         }
     });
-console.log(dataSource)
-    $("#Grid").kendoTreeList({
+    var tree=$("#Grid").kendoTreeList({
         dataSource: dataSource,
         //toolbar: [ "create"],
+        columnMenu: true,
+        reorderable:true,
         resizable: true,
         scrollable: true,
-        //navigatable: false,
+        navigatable: false,
         editable:true,
         selectable: "multiple, row",
         change: function(e) {
@@ -220,10 +259,11 @@ console.log(dataSource)
             buttonCount: 5
         },
         columns: [
-                    {
-                field: "name",
-                title: '姓名',
-                width: 120
+            {
+                title: '',
+                template: '<input class="checkbox" type="checkbox" style="margin-left: auto;margin-right: auto;text-align:center;"/>',
+                width: 30,
+                locked:true
             },
             {
                 field: "childnum",
@@ -311,6 +351,8 @@ console.log(dataSource)
             }
         ]
     });
+    /*grid = $("#Grid").data("kendoTreeList");
+    grid.table.on("click", ".checkbox", selectRow);*/
     function changeParent(id)
     {
         var dialog = $("#dialog").kendoWindow({

@@ -79,12 +79,14 @@
         }
     });
 
-    $("#Grid").kendoGrid({
+    var grid=$("#Grid").kendoGrid({
         dataSource: dataSource,
         height: '100%',
         resizable: true,
         scrollable: true,
         navigatable: false,
+        reorderable:true,
+        columnMenu: true,
         selectable: 'multiple, rowbox',
         pageable: {
             pageSizes: [5, 10, 20, 50],
@@ -95,6 +97,7 @@
                     {
                 field: "ida2a2",
                 title: '<@spring.message "PartBasicAtt.ida2a2"/>',
+                        locked:true,
                 width: 120
             },
                     {
