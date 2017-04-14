@@ -74,7 +74,6 @@
 
     }else {
         //新建
-        alert("新建状态");
     }
 
     //基本信息viewModel
@@ -103,7 +102,27 @@
                     }
                 });
             }else {
-
+                //新建
+                chginfo_viewModel.model.set("__status","add");
+                Hap.submitForm({
+                    url: '${base.contextPath}/bom/chginfo/submit',
+                    formModel: chginfo_viewModel.model,
+                    success: function (data){
+                        if(data.success){
+                            kendo.ui.showInfoDialog({
+                                message: "成功"
+                            }).done(function () {
+                                var chginfoId = data.rows[0].chginfoId;
+                                parent.openTab('BOM_UPDATE'+chginfoId,'更新变更任务', '${base.contextPath}/bom/change/chginfo_detail.html?chginfoId='+chginfoId);
+                                parent.closeTab('BOM_CHANGE_CREATE');
+                            });
+                        }else {
+                            kendo.ui.showErrorDialog({
+                                message: data.message
+                            });
+                        }
+                    }
+                });
             }
         },
         //复制通用意见到受影响对象中方法
@@ -1172,6 +1191,16 @@
         });
     });
 
+    /**
+     * 新建状态
+     */
+    if (chginfoId==0){
+        $("#effectObject,#reviseObject,#deleteObject").find(".panel").hide(0);
+        $("#tool-btn span").attr("disabled","disabled").unbind();
+        $("#basic-info span.btn-primary").attr("disabled","disabled").unbind();
+        $("#confirm-btn span.btn-primary").attr("disabled","disabled").unbind();
+        $("#effectObject,#reviseObject,#deleteObject").attr("disabled","disabled").unbind("click");
+    }
 </script>
 </body>
 </html>
