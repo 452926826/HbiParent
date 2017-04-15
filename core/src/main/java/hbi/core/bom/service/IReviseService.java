@@ -11,5 +11,5 @@ import java.util.List;
 public interface IReviseService extends IBaseService<Revise>, ProxySelf<IReviseService>{
     List<Revise> queryBasic(IRequest request, Revise revise, int page, int pageSize);
 
-    void insterExect(IRequest requestContext, List<List<String>>excelList, Long chginfoId);
+    void insterExect(IRequest requestContext, List<List<String>> excelList, Long chginfoId);
 }

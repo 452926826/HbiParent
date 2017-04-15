@@ -1,5 +1,10 @@
 package hbi.core.bom.controllers;
 
+import com.google.gson.Gson;
+import hbi.core.parsesoap.ResultAfter;
+import hbi.core.parsesoap.ResultUser;
+import hbi.core.parsesoap.SoapUtil;
+import org.apache.axis.encoding.XMLType;
 import hbi.core.bom.util.HmdmExcelUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -15,51 +20,71 @@ import hbi.core.bom.service.IReviseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
     @Controller
     public class ReviseController extends BaseController{
 
     @Autowired
     private IReviseService service;
 
-
+        /**
+         * 新建修订版本
+         * @param page
+         * @param pageSize
+         * @param request
+         * @return
+         */
     @RequestMapping(value = "/bom/revise/query")
     @ResponseBody
-    public ResponseData query(Revise dto, @RequestParam(defaultValue = DEFAULT_PAGE) int page,
-        @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int pageSize, HttpServletRequest request) {
-        IRequest requestContext = createRequestContext(request);
-        return new ResponseData(service.select(requestContext,dto,page,pageSize));
+    public ResponseData query( @RequestParam(defaultValue = DEFAULT_PAGE) int page,
+        @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int pageSize, HttpServletRequest request,@RequestParam String oid,@RequestParam String number
+    ,@RequestParam String name,@RequestParam String type) {
+        /*IRequest requestContext = createRequestContext(request);
+        return new ResponseData(service.select(requestContext,dto,page,pageSize));*/
+        String[] result=(String[])new SoapUtil().request("revise","plmadmin","abc.1234", XMLType.XSD_STRING,"{revise:[{oid:"+oid+",number:"+number+",name:"+name+",type:"+type+"}]}");
+        Gson gson=new Gson();
+        ResultAfter after=gson.fromJson(result[0],ResultAfter.class);
+        ResponseData data=new ResponseData(after.getAfter());
+        if(after.getResult()==0)
+        {
+            data.setMessage("所有对象修订成功");
+        }else if(after.getResult()==-1)
+        {
+            data.setMessage("部分对象修改失败");
+        }else
+        {
+            data.setMessage("接口错误");
+
+        }
+        return data;
     }
 
+        @RequestMapping(value = "/bom/revise/queryBasic")
+        @ResponseBody
+        public ResponseData queryBasic(Revise dto, @RequestParam(defaultValue = DEFAULT_PAGE) int page,
+                                       @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int pageSize, HttpServletRequest request) {
+            IRequest requestContext = createRequestContext(request);
+            return new ResponseData(service.queryBasic(requestContext,dto,page,pageSize));
+        }
 
-    @RequestMapping(value = "/bom/revise/queryBasic")
-    @ResponseBody
-    public ResponseData queryBasic(Revise dto, @RequestParam(defaultValue = DEFAULT_PAGE) int page,
-                                   @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int pageSize, HttpServletRequest request) {
-        IRequest requestContext = createRequestContext(request);
-        return new ResponseData(service.queryBasic(requestContext,dto,page,pageSize));
-    }
+        @RequestMapping(value = "/bom/revise/submit")
+        @ResponseBody
+        public ResponseData update(HttpServletRequest request,@RequestBody List<Revise> dto){
+            IRequest requestCtx = createRequestContext(request);
+            return new ResponseData(service.batchUpdate(requestCtx, dto));
+        }
 
-    @RequestMapping(value = "/bom/revise/submit")
-    @ResponseBody
-    public ResponseData update(HttpServletRequest request,@RequestBody List<Revise> dto){
-        IRequest requestCtx = createRequestContext(request);
-        return new ResponseData(service.batchUpdate(requestCtx, dto));
-    }
-
-    @RequestMapping(value = "/bom/revise/remove")
-    @ResponseBody
-    public ResponseData delete(HttpServletRequest request,@RequestBody List<Revise> dto){
-        service.batchDelete(dto);
-        return new ResponseData();
-    }
+        @RequestMapping(value = "/bom/revise/remove")
+        @ResponseBody
+        public ResponseData delete(HttpServletRequest request,@RequestBody List<Revise> dto){
+            service.batchDelete(dto);
+            return new ResponseData();
+        }
 
         /**
          * 下载模板

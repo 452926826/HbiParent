@@ -1,5 +1,9 @@
 package hbi.core.bom.controllers;
 
+import com.google.gson.Gson;
+import hbi.core.parsesoap.ResultInfo;
+import hbi.core.parsesoap.SoapUtil;
+import org.apache.axis.encoding.XMLType;
 import org.springframework.stereotype.Controller;
 import com.hand.hap.system.controllers.BaseController;
 import com.hand.hap.core.IRequest;
@@ -20,13 +24,32 @@ import java.util.List;
     @Autowired
     private IPartBasicAttService service;
 
-
+        /**
+         * 查询部件基础信息
+         * @param dto
+         * @param page
+         * @param pageSize
+         * @param request
+         * @return
+         */
     @RequestMapping(value = "/bom/part/basic/att/query")
     @ResponseBody
-    public ResponseData query(PartBasicAtt dto, @RequestParam(defaultValue = DEFAULT_PAGE) int page,
-        @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int pageSize, HttpServletRequest request) {
+    public ResponseData query(@RequestParam(defaultValue = DEFAULT_PAGE) int page,
+        @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int pageSize, HttpServletRequest request,@RequestParam(defaultValue = "W27233504022") String number) {
         IRequest requestContext = createRequestContext(request);
-        return new ResponseData(service.select(requestContext,dto,page,pageSize));
+        String[] result=(String[])new SoapUtil().request("getPartBasicAtt","plmadmin","abc.1234", XMLType.XSD_STRING,"{number:"+number+"}");
+        Gson gson=new Gson();
+        ResultInfo info=gson.fromJson(result[0],ResultInfo.class);
+        //service.select(requestContext,dto,page,pageSize);
+        ResponseData data=new ResponseData(info.getPart());
+        if(info.getResult()==0)
+        {
+            data.setMessage("成功");
+        }else
+        {
+            data.setMessage("失败");
+        }
+        return data;
     }
 
     @RequestMapping(value = "/bom/part/basic/att/submit")

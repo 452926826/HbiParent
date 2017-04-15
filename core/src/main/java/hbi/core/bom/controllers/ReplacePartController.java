@@ -1,5 +1,9 @@
 package hbi.core.bom.controllers;
 
+import com.google.gson.Gson;
+import hbi.core.parsesoap.ResultDoc;
+import hbi.core.parsesoap.SoapUtil;
+import org.apache.axis.encoding.XMLType;
 import org.springframework.stereotype.Controller;
 import com.hand.hap.system.controllers.BaseController;
 import com.hand.hap.core.IRequest;
@@ -20,13 +24,32 @@ import java.util.List;
     @Autowired
     private IReplacePartService service;
 
-
+        /**
+         * 获取产品替换物料
+         * @param dto
+         * @param page
+         * @param pageSize
+         * @param request
+         * @return
+         */
     @RequestMapping(value = "/bom/replace/part/query")
     @ResponseBody
     public ResponseData query(ReplacePart dto, @RequestParam(defaultValue = DEFAULT_PAGE) int page,
-        @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int pageSize, HttpServletRequest request) {
-        IRequest requestContext = createRequestContext(request);
-        return new ResponseData(service.select(requestContext,dto,page,pageSize));
+        @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int pageSize, HttpServletRequest request,@RequestParam String ida2a2) {
+        /*IRequest requestContext = createRequestContext(request);
+        return new ResponseData(service.select(requestContext,dto,page,pageSize));*/
+        String[] result=(String[])new SoapUtil().request("getReplacePart","plmadmin","abc.1234", XMLType.XSD_STRING,"{ida2a2:"+ida2a2+"}");
+        Gson gson=new Gson();
+        ResultDoc doc=gson.fromJson(result[0],ResultDoc.class);
+        ResponseData data=new ResponseData(doc.getDoc());
+        if(doc.getResult()==0)
+        {
+            data.setMessage("成功");
+        }else
+        {
+            data.setMessage("失败");
+        }
+        return data;
     }
 
     @RequestMapping(value = "/bom/replace/part/submit")

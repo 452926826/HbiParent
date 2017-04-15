@@ -45,7 +45,8 @@
             var authenpartDataSource = new kendo.data.DataSource({
                 transport: {
                     read: {
-                        url: "${base.contextPath}/bom/key/part/query?oid="+checked[0].oid,
+                        url: "${base.contextPath}/bom/key/part/query?oid="+checked[0].oid+"&number="
+                        +checked[0].number+"&version="+checked[0].version,
                         type: "POST",
                         dataType: "json"
                     },

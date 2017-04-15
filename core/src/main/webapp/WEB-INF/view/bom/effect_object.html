@@ -28,7 +28,6 @@
     <script>kendo.bind($('#query-form'), viewModel);</script>
     <div style="clear:both">
         <div id="Grid"></div>
-        <div id="detaildialog"></div>
     </div>
 </div>
 
@@ -38,22 +37,22 @@
     dataSource = new kendo.data.DataSource({
         transport: {
             read: {
-                url: BaseUrl + "/bom/part/basic/att/query",
+                url: BaseUrl + "/bom/effect/object/query",
                 type: "POST",
                 dataType: "json"
             },
             update: {
-                url: BaseUrl + "/bom/part/basic/att/submit",
+                url: BaseUrl + "/bom/effect/object/submit",
                 type: "POST",
                 contentType: "application/json"
             },
             destroy: {
-                url: BaseUrl + "/bom/part/basic/att/remove",
+                url: BaseUrl + "/bom/effect/object/remove",
                 type: "POST",
                 contentType: "application/json"
             },
             create: {
-                url: BaseUrl + "/bom/part/basic/att/submit",
+                url: BaseUrl + "/bom/effect/object/submit",
                 type: "POST",
                 contentType: "application/json"
             },
@@ -73,20 +72,18 @@
             data: 'rows',
             total: 'total',
             model: {
-                id: "basicAttId",
+                id: "objectId",
                 fields: {}
             }
         }
     });
 
-    var grid=$("#Grid").kendoGrid({
+    $("#Grid").kendoGrid({
         dataSource: dataSource,
         height: '100%',
         resizable: true,
         scrollable: true,
         navigatable: false,
-        reorderable:true,
-        columnMenu: true,
         selectable: 'multiple, rowbox',
         pageable: {
             pageSizes: [5, 10, 20, 50],
@@ -94,98 +91,60 @@
             buttonCount: 5
         },
         columns: [
-                    {
-                field: "ida2a2",
-                title: '<@spring.message "PartBasicAtt.ida2a2"/>',
-                        locked:true,
+            {
+                field: "objectId",
+                title: '<@spring.message "EffectObject.objectId"/>',
                 width: 120
             },
                     {
-                field: "username",
-                title: '<@spring.message "PartBasicAtt.username"/>',
+                field: "chginfoId",
+                title: '<@spring.message "EffectObject.chginfoId"/>',
                 width: 120
             },
                     {
-                field: "number",
-                title: '<@spring.message "PartBasicAtt.number"/>',
+                field: "oid",
+                title: '<@spring.message "EffectObject.oid"/>',
                 width: 120
             },
                     {
-                field: "name",
-                title: '<@spring.message "PartBasicAtt.name"/>',
+                field: "chgdescription",
+                title: '<@spring.message "EffectObject.chgdescription"/>',
                 width: 120
             },
                     {
-                field: "version",
-                title: '<@spring.message "PartBasicAtt.version"/>',
+                field: "inworksol",
+                title: '<@spring.message "EffectObject.inworksol"/>',
                 width: 120
             },
                     {
-                field: "status",
-                title: '<@spring.message "PartBasicAtt.status"/>',
+                field: "stocksol",
+                title: '<@spring.message "EffectObject.stocksol"/>',
                 width: 120
             },
                     {
-                field: "view",
-                title: '<@spring.message "PartBasicAtt.view"/>',
+                field: "testsol",
+                title: '<@spring.message "EffectObject.testsol"/>',
                 width: 120
             },
                     {
-                field: "state",
-                title: '<@spring.message "PartBasicAtt.state"/>',
+                field: "softwaresol",
+                title: '<@spring.message "EffectObject.softwaresol"/>',
                 width: 120
             },
                     {
-                field: "modifyer",
-                title: '<@spring.message "PartBasicAtt.modifyer"/>',
+                field: "isdeletema",
+                title: '<@spring.message "EffectObject.isdeletema"/>',
                 width: 120
             },
                     {
-                field: "modtime",
-                title: '<@spring.message "PartBasicAtt.modtime"/>',
+                field: "description",
+                title: '<@spring.message "EffectObject.description"/>',
                 width: 120
             },
-                    {
-                field: "createtime",
-                title: '<@spring.message "PartBasicAtt.createtime"/>',
-                width: 120
-            },
-                    {
-                field: "container",
-                title: '<@spring.message "PartBasicAtt.container"/>',
-                width: 120
-            },    {
-                title: '编辑',
-                width: 120,
-                template:function(dataItem)
-                {
-                    var ids=JSON.stringify(dataItem);
-                    var item=dataItem;
-                    return "<a href='javascript:void(0);' onclick=getDetail('"+item.ida2a2+"','"+item.name+"','"+item.state+"','"+item.status+"','"+item.modifyer+"','"+item.number+"','"+item.version+"','"+item.modtime+"')>查看详情</a>";
-                }
-            }
         ],
         editable: true
     });
-    function getDetail(ida2a2,name,state,status,modifyer,number,version,modtime)
-    {
-        $('#Grid').data('kendoGrid').dataSource.page(1);
-        var title = ida2a2+'-详细信息';
-        var dialog = $("#detaildialog")
-            .kendoWindow(
-                {
-                    actions : [ "Close" ],
-                    width: 920,
-                    height: 450,
-                    modal: true,
-                    visible: false,
-                    iframe: true,
-                    content: 'employees.html?ida2a2='+ida2a2+'&name='+name+
-                        '&state='+state+'&status='+status+'&modifyer='+modifyer+
-                        '&number='+number+"&version="+version+"&modtime="+modtime
-                }).data("kendoWindow").title(title);
-        dialog.maximize().open();
-    }
+
     function deleteData() {
 
         Hap.deleteGridSelection({

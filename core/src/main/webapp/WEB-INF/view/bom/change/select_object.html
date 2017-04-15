@@ -48,7 +48,7 @@
         var objectDataSource = new kendo.data.DataSource({
             transport: {
                 read: {
-                    url: "${base.contextPath}/bom/wnc/part/queryBasic",
+                    url: "${base.contextPath}/bom/wnc/part/query",
                     type: "POST",
                     dataType: "json"
                 },
@@ -218,6 +218,7 @@
                             }
                         }
                     });
+
                 }
             }else if(addObjectStr=="reviseObject-add-btn") {
                 //添加受影响对象
