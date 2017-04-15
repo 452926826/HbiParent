@@ -57,7 +57,7 @@
            e.preventDefault();
             var treeList = $("#Grid").data("kendoTreeList");
             for (var i = 0;i<$("#Grid input[type=checkbox]:checked").length;i++){
-                var uid = $("#Grid input[type=checkbox]:checked").eq(i).attr("data-uid");
+                var uid = $("#Grid input[type=checkbox]:checked").eq(i).parents("tr").attr("data-uid");
                 var row = treeList.content.find("tr[data-uid=" + uid+ "]");
                 treeList.expand(row)
             }
@@ -67,7 +67,7 @@
             e.preventDefault();
             var treeList = $("#Grid").data("kendoTreeList");
             for (var i = 0;i<$("#Grid input[type=checkbox]:checked").length;i++){
-                var uid = $("#Grid input[type=checkbox]:checked").eq(i).attr("data-uid");
+                var uid = $("#Grid input[type=checkbox]:checked").eq(i).parents("tr").attr("data-uid");
                 var row = treeList.content.find("tr[data-uid=" + uid+ "]");
                 treeList.collapse(row);
             }
