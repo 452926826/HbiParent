@@ -35,8 +35,8 @@
 <script type="text/javascript">
     var viewModel = kendo.observable({
         model: {},
+        //新加子分类
         createFunction: function () {
-            //新加子分类
             var length = $("#Grid input[type=checkbox]:checked").length;
             if(length!=1){
                 kendo.ui.showInfoDialog({
@@ -47,36 +47,11 @@
                 var treeList = $("#Grid").data("kendoTreeList");
                 var rowNew=treeList.addRow($('[data-uid='+uid+']'));
             }
-
-
         },
+        //保存
         saveFunction: function () {
             $('#Grid').data('kendoTreeList').saveRow();
         },
-        deleteFunction:function(e)
-        {
-            for( var i=0;i<selectedDataItems.length;i++)
-            {
-                $('#Grid').data('kendoTreeList').removeRow(selectedDataItems[i]);
-            }
-        },
-        queryResource: function (e) {
-            $('#Grid').data('kendoTreeList').dataSource.page(1);
-        },
-        resetForm: function (e) {
-            e.preventDefault();
-            var formData = viewModel.model.toJSON();
-            for (k in formData) {
-                viewModel.model.set(k, null);
-            }
-        },
-
-
-        cancelFunction: function () {
-            /*$("#Grid").data("kendoTreeList")._cancelEdit();*/
-        },
-
-
         //展开
         expandFunction:function(e) {
            e.preventDefault();
@@ -204,13 +179,6 @@
             <i class="fa fa-expand" style="margin-right:3px;"></i>展开全部</span>
         <span class="btn btn-warning" data-bind="click:compressAllFunction" style="float:left;margin-right:5px;">
             <i class="fa fa-compress" style="margin-right:3px;"></i>收缩全部</span>
-    </div>
-    <div class="pull-right"  style="padding-bottom:10px;">
-        <span class="btn btn-primary" style="width:70px" data-bind="click:queryResource"
-              type="submit"><i class="fa fa-search" style="margin-right:3px;"></i><@spring.message "hap.query"/></span>
-        <span class="btn btn-default" style="width:70px" data-bind="click:resetForm" type="button"><i
-                class="fa fa-refresh"
-                style="margin-right:3px;"></i><@spring.message "hap.reset"/></span>
     </div>
     <div  style="clear:both">
         <div id="Grid" style="margin-bottom: 30px;"></div>
