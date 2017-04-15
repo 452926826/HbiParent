@@ -248,22 +248,22 @@
     dataSource = new kendo.data.TreeListDataSource({
         transport: {
             read: {
-                url: BaseUrl + "/hap/employees/query",
+                url: BaseUrl + "/bom/bom/query",
                 type: "POST",
                 dataType: "json"
             },
             update: {
-                url: BaseUrl + "/hap/employees/submit",
+                url: BaseUrl + "/bom/bom/submit",
                 type: "POST",
                 contentType: "application/json"
             },
             destroy: {
-                url: BaseUrl + "/hap/employees/remove",
+                url: BaseUrl + "/bom/bom/remove",
                 type: "POST",
                 contentType: "application/json"
             },
             create: {
-                url: BaseUrl + "/hap/employees/submit",
+                url: BaseUrl + "/bom/bom/submit",
                 type: "POST",
                 contentType: "application/json"
             },
@@ -283,14 +283,15 @@
             data: 'rows',
             total: 'total',
             model: {
-                id: "employeeId",
+                id: "id",
+                parentId:"parentid",
                 //expanded: true,
                 fields: {
-                    bornDate:{type:"date"}
                 }
             }
         }
     });
+    console.log(dataSource);
     var tree=$("#Grid").kendoTreeList({
         dataSource: dataSource,
         //toolbar: [ "create"],
