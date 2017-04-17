@@ -139,6 +139,9 @@
             });
         }else {
             chginfo_viewModel.model.set("processor",selection[0].oid);
+            chginfo_viewModel.model.set("number",selection[0].number);
+            chginfo_viewModel.model.set("userOid",selection[0].oid);
+            chginfo_viewModel.model.set("username",selection[0].name);
             $("#user-dialog").data("kendoWindow").close();
         }
     });

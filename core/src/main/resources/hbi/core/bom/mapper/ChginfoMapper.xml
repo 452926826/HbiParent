@@ -10,6 +10,13 @@
         <result column="stocksol" property="stocksol" jdbcType="VARCHAR" />
         <result column="testsol" property="testsol" jdbcType="VARCHAR" />
         <result column="softwaresol" property="softwaresol" jdbcType="VARCHAR" />
+
+        <result column="user_oid" property="userOid" jdbcType="VARCHAR" />
+        <result column="username" property="username" jdbcType="VARCHAR" />
+        <result column="number" property="number" jdbcType="VARCHAR" />
+
+
+
     </resultMap>
 
 
