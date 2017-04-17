@@ -193,7 +193,12 @@
                         dataObj.push({
                             "__status":"add",
                             chginfoId:chginfoId,
-                            oid:selection[k].oid
+                            oid:selection[k].oid,
+                            number:selection[k].number,
+                            name:selection[k].name,
+                            type:selection[k].type,
+                            version:selection[k].version,
+                            state:selection[k].state
                         });
                     }
                     //插入到受影响对象
@@ -239,8 +244,13 @@
                     for (var y = 0; y < selection.length; y++) {
                         dataObj_reviseObject.push({
                             "__status": "add",
-                            chginfoId: chginfoId,
-                            oid: selection[y].oid
+                            chginfoId:chginfoId,
+                            oid:selection[y].oid,
+                            number:selection[y].number,
+                            name:selection[y].name,
+                            type:selection[y].type,
+                            version:selection[y].version,
+                            state:selection[y].state
                         });
                     }
                     //插入到产生对象

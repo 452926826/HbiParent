@@ -25,23 +25,21 @@ public class Revise extends BaseDTO {
 
     private String description;
 
-    @Transient
     private String number;
 
-    @Transient
     private String name;
 
-    @Transient
     private String type;
 
-    @Transient
     private String version;
 
-    @Transient
     private String state;
 
-    @Transient
     private String modifyer;
+
+    private String isauthen;
+
+    private String authenpart;
 
     public void setReviseId(Long reviseId){
         this.reviseId = reviseId;
@@ -137,5 +135,21 @@ public class Revise extends BaseDTO {
 
     public void setModifyer(String modifyer) {
         this.modifyer = modifyer;
+    }
+
+    public String getIsauthen() {
+        return isauthen;
+    }
+
+    public void setIsauthen(String isauthen) {
+        this.isauthen = isauthen;
+    }
+
+    public String getAuthenpart() {
+        return authenpart;
+    }
+
+    public void setAuthenpart(String authenpart) {
+        this.authenpart = authenpart;
     }
 }

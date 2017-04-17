@@ -16,6 +16,8 @@
         <result column="version" property="version" jdbcType="VARCHAR" />
         <result column="state" property="state" jdbcType="VARCHAR" />
         <result column="modifyer" property="modifyer" jdbcType="VARCHAR" />
+        <result column="isauthen" property="isauthen" jdbcType="VARCHAR" />
+        <result column="authenpart" property="authenpart" jdbcType="VARCHAR" />
     </resultMap>
 
     <select id="queryBasic" resultMap="BaseResultMap" parameterType="hbi.core.bom.dto.Revise">
@@ -27,15 +29,14 @@
         br.result,
         br.description,
         br.OBJECT_VERSION_NUMBER,
-        bwp.number,
-        bwp.name,
-        bwp.type,
-        bwp.version,
-        bwp.state,
-        bwp.modifyer
+        br.number,
+        br.name,
+        br.type,
+        br.version,
+        br.state,
+        br.modifyer
         FROM
         bom_revise AS br
-        LEFT JOIN bom_wnc_part bwp ON bwp.oid = br.oid
         <where>
             <if test="chginfoId!=null">
                 AND CHGINFO_ID = #{chginfoId}

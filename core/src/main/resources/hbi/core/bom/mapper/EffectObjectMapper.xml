@@ -6,15 +6,6 @@
         <result column="OBJECT_ID" property="objectId" jdbcType="DECIMAL" />
         <result column="CHGINFO_ID" property="chginfoId" jdbcType="DECIMAL" />
         <result column="oid" property="oid" jdbcType="VARCHAR" />
-        <result column="chgdescription" property="chgdescription" jdbcType="VARCHAR" />
-        <result column="inworksol" property="inworksol" jdbcType="VARCHAR" />
-        <result column="stocksol" property="stocksol" jdbcType="VARCHAR" />
-        <result column="testsol" property="testsol" jdbcType="VARCHAR" />
-        <result column="softwaresol" property="softwaresol" jdbcType="VARCHAR" />
-        <result column="isdeletema" property="isdeletema" jdbcType="VARCHAR" />
-        <result column="description" property="description" jdbcType="VARCHAR" />
-
-
         <result column="number" property="number" jdbcType="VARCHAR" />
         <result column="name" property="name" jdbcType="VARCHAR" />
         <result column="type" property="type" jdbcType="VARCHAR" />
@@ -22,9 +13,13 @@
         <result column="state" property="state" jdbcType="VARCHAR" />
         <result column="isauthen" property="isauthen" jdbcType="VARCHAR" />
         <result column="authenpart" property="authenpart" jdbcType="VARCHAR" />
-
-
-
+        <result column="chgdescription" property="chgdescription" jdbcType="VARCHAR" />
+        <result column="inworksol" property="inworksol" jdbcType="VARCHAR" />
+        <result column="stocksol" property="stocksol" jdbcType="VARCHAR" />
+        <result column="testsol" property="testsol" jdbcType="VARCHAR" />
+        <result column="softwaresol" property="softwaresol" jdbcType="VARCHAR" />
+        <result column="isdeletema" property="isdeletema" jdbcType="VARCHAR" />
+        <result column="description" property="description" jdbcType="VARCHAR" />
     </resultMap>
 
     <select id="queryBasic" resultMap="BaseResultMap" parameterType="hbi.core.bom.dto.EffectObject">
@@ -32,24 +27,23 @@
         beo.object_id,
         beo.chginfo_id,
         beo.oid,
-        bwp.number,
-        bwp.`name`,
-        bwp.type,
-        bwp.version,
-        bwp.state,
+        beo.number,
+        beo.`name`,
+        beo.type,
+        beo.version,
+        beo.state,
         beo.chgdescription,
         beo.inworksol,
         beo.stocksol,
         beo.testsol,
         beo.softwaresol,
         beo.isdeletema,
-        bwp.isauthen,
-        bwp.authenpart,
+        beo.isauthen,
+        beo.authenpart,
         beo.description,
         beo.OBJECT_VERSION_NUMBER
         FROM
             BOM_EFFECT_OBJECT beo
-        LEFT JOIN BOM_WNC_PART bwp ON beo.oid = bwp.oid
         <where>
             <if test="chginfoId!=null">
                 AND chginfo_id = #{chginfoId}
