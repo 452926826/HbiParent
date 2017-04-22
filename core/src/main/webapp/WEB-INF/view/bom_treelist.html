@@ -30,6 +30,8 @@
     <div style="float: left;height: 100px;margin-right: 10px;">
         <button id="collapseAll" style="display: block;">收缩全部</button>
         <button id="expandAll" style="display: block;margin-top: 5px;">展开全部</button>
+        <button id="collapseOne" style="display: block;margin-top: 5px;">收缩</button>
+        <button id="expandOne" style="display: block;margin-top: 5px;">展开</button>
     </div>
     <div style="float: left;margin-right: 10px;">
         <span style="width: 120px;text-align: center;display: inline-block;font-size: 14px;margin-bottom: 5px;">显示/隐藏列</span>
@@ -87,8 +89,9 @@
             {
                 width: 800,
                 source: dataAdapter,
-                sortable: true,
+                /*hierarchicalCheckboxes: true,*/
                 altRows: true,
+                checkboxes:true,
                 filterable: true,
                 ready: function()
                 {
@@ -158,8 +161,6 @@
     $("#jqxlistbox2").jqxListBox({source: listSource2, width: 120, height: 200,  checkboxes: true });
     $("#jqxlistbox2").on('checkChange', function (event) {
         NProgress.start();
-        console.log(event.args.value)
-        console.log(event.args.checked)
         $("#treeGrid").jqxTreeGrid('beginUpdate');
         $("#treeGrid").jqxTreeGrid('setColumnProperty', event.args.value, 'pinned', event.args.checked);
         $("#treeGrid").jqxTreeGrid('endUpdate');
@@ -179,6 +180,20 @@
         NProgress.start();
         $("#treeGrid").jqxTreeGrid('expandAll');
         NProgress.done();
+    });
+
+   $("#expandOne").click(function () {
+       var selection = $("#treeGrid").jqxTreeGrid('getCheckedRows');
+       for (var i = 0; i < selection.length; i++) {
+           $("#treeGrid").jqxTreeGrid('expandRow',selection[i].id);
+       }
+    });
+
+    $("#collapseOne").click(function () {
+        var selection = $("#treeGrid").jqxTreeGrid('getCheckedRows');
+        for (var i = 0; i < selection.length; i++) {
+            $("#treeGrid").jqxTreeGrid('collapseRow',selection[i].id);
+        }
     });
 
     $('#treeGrid').on('bindingComplete', function (event) { NProgress.done(); });
