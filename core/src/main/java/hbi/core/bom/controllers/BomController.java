@@ -250,11 +250,18 @@ public class BomController extends BaseController {
         return new ResponseData(list);
     }
 
+    @RequestMapping(value = "/bom/bom/queryAll")
+    @ResponseBody
+    public ResponseData queryAll(Bom dto, @RequestParam(defaultValue = DEFAULT_PAGE) int page,
+                                 @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int pageSize, HttpServletRequest request) {
+        IRequest requestCtx = createRequestContext(request);
+        return new ResponseData(service.select(requestCtx, dto, page, pageSize));
+    }
 
     @RequestMapping(value = "/bom/bom/queryAllMysql")
     @ResponseBody
     public ResponseData queryAllMysql(Bom dto, @RequestParam(defaultValue = DEFAULT_PAGE) int page,
-                              @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int pageSize, HttpServletRequest request) {
+                                      @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int pageSize, HttpServletRequest request) {
         String id = request.getParameter("idida2a2");
         String number = request.getParameter("number");
         String version = request.getParameter("version");
@@ -289,3 +296,4 @@ public class BomController extends BaseController {
         }
     }
 }
+
