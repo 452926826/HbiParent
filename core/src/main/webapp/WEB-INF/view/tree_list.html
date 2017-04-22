@@ -1,0 +1,121 @@
+<#include "include/header.html">
+<body>
+<div id="example">
+    <!--收缩展开-->
+    <div id="tool-btn">
+        <div class="panel">
+            <span id="compress" class="btn btn-primary"><i class="fa fa-compress" style="margin-right:3px;"></i>收缩</span>
+            <span id="expand" class="btn btn-danger"><i class="fa fa-expand" style="margin-right:3px;"></i>展开</span>
+            <span id="compress-all" class="btn btn-primary"><i class="fa fa-compress" style="margin-right:3px;"></i>收缩全部</span>
+            <span id="expand-all" class="btn btn-danger"><i class="fa fa-expand" style="margin-right:3px;"></i>展开全部</span>
+        </div>
+    </div>
+    <div id="treelist"></div>
+    <script>
+        $(document).ready(function () {
+            //获取测试数据
+            var crudServiceBaseUrl = "//demos.telerik.com/kendo-ui/service";
+            var dataSource = new kendo.data.TreeListDataSource({
+                transport: {
+                    read:  {
+                        url: crudServiceBaseUrl + "/EmployeeDirectory/All",
+                        dataType: "jsonp"
+                    },
+                    update: {
+                        url: crudServiceBaseUrl + "/EmployeeDirectory/Update",
+                        dataType: "jsonp"
+                    },
+                    destroy: {
+                        url: crudServiceBaseUrl + "/EmployeeDirectory/Destroy",
+                        dataType: "jsonp"
+                    },
+                    create: {
+                        url: crudServiceBaseUrl + "/EmployeeDirectory/Create",
+                        dataType: "jsonp"
+                    },
+                    parameterMap: function(options, operation) {
+                        if (operation !== "read" && options.models) {
+                            return {models: kendo.stringify(options.models)};
+                        }
+                    }
+                },
+                batch: true,
+                schema: {
+                    model: {
+                        id: "EmployeeId",
+                        parentId: "ReportsTo",
+                        fields: {
+                            EmployeeId: { type: "number", editable: false, nullable: false },
+                            ReportsTo: { nullable: true, type: "number" },
+                            FirstName: { validation: { required: true } },
+                            LastName: { validation: { required: true } },
+                            HireDate: { type: "date" },
+                            Phone: { type: "string" },
+                            HireDate: { type: "date" },
+                            BirthDate: { type: "date" },
+                            Extension: { type: "number", validation: { min: 0, required: true } },
+                            Position: { type: "string" }
+                        }
+                    }
+                }
+            });
+            var treelist = $("#treelist").kendoTreeList({
+                dataSource: dataSource,
+
+                selectable:'row',
+                columns: [{
+                    template: function(dataItem){
+                        return "<input type='checkbox' name='check' data-uid="+dataItem.uid+"   />";
+                    },
+                    width: 32,
+                    attributes: {
+                        "class": "table-header-cell",
+                        style: "text-align: center;"
+                    }
+                },
+                    { field: "FirstName", expandable: true, title: "First Name", width: 250 },
+                    { field: "LastName", title: "Last Name" },
+                    { field: "HireDate", title: "Hire Date", format: "{0:MMMM d, yyyy}" },
+                    { field: "Extension", title: "Ext", format: "{0:#}" },
+                    { command: [ "edit", "destroy" ] }
+                ]
+            });
+        }).data("kendoTreeList");
+
+        //收缩
+        $("#tool-btn span.btn-primary").on("click",function (e) {
+            e.preventDefault();
+            var treeList = $("#treelist").data("kendoTreeList");
+            for (var i = 0;i<$("#treelist input[type=checkbox]:checked").length;i++){
+                var uid = $("#treelist input[type=checkbox]:checked").eq(i).attr("data-uid");
+                var row = treeList.content.find("tr[data-uid=" + uid+ "]");
+                treeList.collapse(row);
+            }
+        });
+
+        //展开
+        $("#tool-btn span.btn-danger").on("click",function (e) {
+            e.preventDefault();
+            var treeList = $("#treelist").data("kendoTreeList");
+            for (var i = 0;i<$("#treelist input[type=checkbox]:checked").length;i++){
+                var uid = $("#treelist input[type=checkbox]:checked").eq(i).attr("data-uid");
+                var row = treeList.content.find("tr[data-uid=" + uid+ "]");
+                treeList.expand(row)
+            }
+            /*var uid = $("#treelist input[type=radio]:checked").attr("data-uid");
+            var treeList = $("#treelist").data("kendoTreeList");
+            var row = treeList.content.find("tr[data-uid=" + uid+ "]");
+            treeList.expand(row);*/
+        });
+
+
+    </script>
+    <style>
+        .configuration .k-textbox
+        {
+            width: 23px;
+        }
+    </style>
+</div>
+</body>
+</html>

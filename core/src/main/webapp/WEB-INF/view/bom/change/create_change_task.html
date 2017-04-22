@@ -43,7 +43,7 @@
         line-height: 1.5 !important;
     }
 </style>
-<script src="http://kendo.cdn.telerik.com/2017.1.118/js/jszip.min.js"></script>
+    <script src="${base.contextPath}/lib/jszip.min.js"></script>
 <script>
     //获取查询页面传递过来的chginfoId
     //0->新建状态 !0更新状态
@@ -66,7 +66,7 @@
 
     }else {
         //新建
-        alert("新建状态");
+        //alert("新建状态");
     }
 
     //基本信息viewModel
@@ -74,7 +74,8 @@
         model: {
         },
         //保存方法
-        saveFunction:function (e) {
+        saveFunction1:function (e) {
+            console.log(123);
             e.preventDefault();
             if(chginfoId!=0){
                 //更新
@@ -95,7 +96,23 @@
                     }
                 });
             }else {
-
+                //更新
+                chginfo_viewModel.model.set("__status","add");
+                Hap.submitForm({
+                    url: '${base.contextPath}/bom/chginfo/submit',
+                    formModel: chginfo_viewModel.model,
+                    success: function (json){
+                        if(json.success){
+                            kendo.ui.showInfoDialog({
+                                message: "成功"
+                            });
+                        }else{
+                            kendo.ui.showErrorDialog({
+                                message: "失败"
+                            });
+                        }
+                    }
+                });
             }
         },
         //复制通用意见到受影响对象中方法
@@ -126,7 +143,7 @@
         model: {
         },
         //保存方法
-        saveFunction: function () {
+        saveFunction2: function () {
             $('#effectObject-Grid').data('kendoGrid').saveChanges();
         },
         //删除方法
@@ -256,7 +273,7 @@
                     <span class="btn btn-primary" data-bind="click:copyFunction"  style="width:220px;float:left;margin: 5px;"
                           type="submit"><i class="fa fa-copy" style="margin-right:3px;"></i>复制通用意见到受影响对象中</span>
                     <!--保存-->
-                    <span id="save-btn" data-bind="click:saveFunction" class="btn btn-success"
+                    <span id="save-btn" data-bind="click:saveFunction1" class="btn btn-success"
                           style="float:left;margin: 5px;"><i class="fa fa-save" style="margin-right:5px;"></i><@spring.message "hap.save"/></span>
                 </div>
             </div>
@@ -292,7 +309,7 @@
                                        style="margin-right:3px;"></i>添加</span>
             <!--保存-->
             <span style="float:left;margin-right:5px;" class="btn btn-success"
-                  data-bind="click:saveFunction">
+                  data-bind="click:saveFunction2">
             <i class="fa fa-save" style="margin-right:3px;"></i>保存</span>
             <!--删除-->
             <span style="float:left;margin-right:5px;" class="btn btn-danger"
@@ -401,7 +418,7 @@
         var userDataSource = new kendo.data.DataSource({
             transport: {
                 read: {
-                    url: "${base.contextPath}/bom/wnc/user/queryBasic",
+                    url: "${base.contextPath}/bom/wnc/user/query",
                     type: "POST",
                     dataType: "json"
                 },
@@ -746,7 +763,7 @@
         var objectDataSource = new kendo.data.DataSource({
             transport: {
                 read: {
-                    url: "${base.contextPath}/bom/wnc/part/queryBasic",
+                    url: "${base.contextPath}/bom/wnc/part/query",
                     type: "POST",
                     dataType: "json"
                 },
@@ -880,7 +897,12 @@
                     data:JSON.stringify([{
                         "__status":"add",
                         chginfoId:chginfoId,
-                        oid:selection[0].oid
+                        oid:selection[0].oid,
+                        number:selection[0].number,
+                        name:selection[0].name,
+                        type:selection[0].type,
+                        version:selection[0].version,
+                        state:selection[0].state
                     }]),
                     success:function (json) {
                         kendo.ui.showInfoDialog({
@@ -977,7 +999,8 @@
             var authenpartDataSource = new kendo.data.DataSource({
                 transport: {
                     read: {
-                        url: "${base.contextPath}/bom/key/part/query?oid="+checked[0].oid,
+                        url: "${base.contextPath}/bom/key/part/query?oid="+checked[0].oid+"&number="
+                        +checked[0].number+"&version="+checked[0].version,
                         type: "POST",
                         dataType: "json"
                     },
@@ -1112,10 +1135,68 @@
         excelWindow();
     });
 
-    //新建修订版本
     $("#revise-btn").click(function (e) {
         e.preventDefault();
-        alert(1);
+        var selection = $('#effectObject-Grid').data('kendoGrid').selectedDataItems();
+        if(selection.length==0){
+            kendo.ui.showInfoDialog({
+                message:"请至少选择一条数据"
+            });
+        }else {
+            /**
+             * 前端唯一性校验
+             */
+            var oidArr = [];
+            var flag = false;//是否含有相同数据标识[false未含,true含有]
+            //添加受影响对象
+            for(var i =0;i<reviseObject_dataSource._data.length;i++){
+                oidArr.push(reviseObject_dataSource._data[i].oid);
+            }
+            for (var j =0;j<selection.length;j++){
+                if (oidArr.indexOf(selection[j].oid)!=-1){
+                    flag = true;
+                    break;
+                }
+            }
+            if(flag){
+                kendo.ui.showInfoDialog({
+                    message:"数据重复"
+                });
+            }else {
+                var dataObj_reviseObject = [];
+                for (var y = 0; y < selection.length; y++) {
+                    dataObj_reviseObject.push({
+                        "__status": "add",
+                        chginfoId: chginfoId,
+                        oid: selection[y].oid,
+                        number:selection[y].number,
+                        name:selection[y].name,
+                        type:selection[y].type
+                    });
+                }
+                //插入到产生对象
+                $.ajax({
+                    url: BaseUrl + "/bom/revise/submitUpdate",
+                    type: "POST",
+                    contentType: "application/json",
+                    dataType: "json",
+                    data: JSON.stringify(dataObj_reviseObject),
+                    success: function (json) {
+                        if (json.success) {
+                            kendo.ui.showInfoDialog({
+                                message: json.message
+                            }).done(function () {
+                                $("#reviseObject-Grid .k-i-refresh").trigger("click");
+                            });
+                        } else {
+                            kendo.ui.showInfoDialog({
+                                message:  json.message
+                            })
+                        }
+                    }
+                });
+            }
+        }
     });
 
 </script>

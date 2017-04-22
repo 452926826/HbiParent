@@ -19,6 +19,22 @@ public class EffectObject extends BaseDTO {
 
     private String oid;
 
+    private String number;
+
+    private String name;
+
+    private String type;
+
+    private String version;
+
+    private String state;
+
+    private String modifyer;
+
+    private String isauthen;
+
+    private String authenpart;
+
     private String chgdescription;
 
     private String inworksol;
@@ -32,27 +48,6 @@ public class EffectObject extends BaseDTO {
     private String isdeletema;
 
     private String description;
-
-    @Transient
-    private String number;
-
-    @Transient
-    private String name;
-
-    @Transient
-    private String type;
-
-    @Transient
-    private String version;
-
-    @Transient
-    private String state;
-
-    @Transient
-    private String isauthen;
-
-    @Transient
-    private String authenpart;
 
 
     public String getNumber() {
@@ -191,4 +186,11 @@ public class EffectObject extends BaseDTO {
         return description;
     }
 
+    public String getModifyer() {
+        return modifyer;
+    }
+
+    public void setModifyer(String modifyer) {
+        this.modifyer = modifyer;
+    }
 }

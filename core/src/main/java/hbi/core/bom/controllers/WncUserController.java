@@ -1,5 +1,10 @@
 package hbi.core.bom.controllers;
 
+import com.google.gson.Gson;
+import hbi.core.parsesoap.ResultDoc;
+import hbi.core.parsesoap.ResultUser;
+import hbi.core.parsesoap.SoapUtil;
+import org.apache.axis.encoding.XMLType;
 import org.springframework.stereotype.Controller;
 import com.hand.hap.system.controllers.BaseController;
 import com.hand.hap.core.IRequest;
@@ -20,13 +25,31 @@ import java.util.List;
     @Autowired
     private IWncUserService service;
 
-
+        /**
+         * 搜索WNC系统用户
+         * @param page
+         * @param pageSize
+         * @param request
+         * @return
+         */
     @RequestMapping(value = "/bom/wnc/user/query")
     @ResponseBody
-    public ResponseData query(WncUser dto, @RequestParam(defaultValue = DEFAULT_PAGE) int page,
-        @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int pageSize, HttpServletRequest request) {
-        IRequest requestContext = createRequestContext(request);
-        return new ResponseData(service.select(requestContext,dto,page,pageSize));
+    public ResponseData query( @RequestParam(defaultValue = DEFAULT_PAGE) int page,
+        @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int pageSize, HttpServletRequest request,WncUser dto) {
+       /* IRequest requestContext = createRequestContext(request);
+        return new ResponseData(service.select(requestContext,dto,page,pageSize));*/
+        String[] result=(String[])new SoapUtil().request("getWNCUser","plmadmin","abc.1234", XMLType.XSD_STRING,"{name:"+dto.getName()+",number:"+dto.getNumber()+"}");
+        Gson gson=new Gson();
+        ResultUser user=gson.fromJson(result[0],ResultUser.class);
+        ResponseData data=new ResponseData(user.getUser());
+        if(user.getResult()==0)
+        {
+            data.setMessage("成功");
+        }else
+        {
+            data.setMessage("失败");
+        }
+        return data;
     }
 
     /**

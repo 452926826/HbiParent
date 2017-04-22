@@ -9,8 +9,15 @@
             $('#Grid').data('kendoGrid').saveChanges();
         },
         queryResource: function (e) {
-            $('#Grid').data('kendoGrid').dataSource.page(1);
-        }
+            /*parent.openTab('GET_BOMs2','获取BOMS(直连)', '${base.contextPath}/bom/sql.html?ida2a2=210638092&name=123'+
+                '&state=123&status=123&modifyer=123'+
+                '&number=123&version=123&modtime=123&view=123');*/
+            $('#Grid').data('kendoGrid').dataSource.read();
+        }/*,
+        queryResourceSql: function (e) {
+            sqlurl="/bom/part/basic/att/querysql";
+            $('#Grid').data('kendoGrid').dataSource.read();
+        }*/
     });
 </script>
 <body>
@@ -22,7 +29,11 @@
     </div>
     <script>kendo.bind($('#toolbar-btn'), viewModel);</script>
     <div class="pull-right" id="query-form" style="padding-bottom:10px;">
-        <span class="btn btn-primary" style="float:left;width:70px" data-bind="click:queryResource" type="submit"><@spring.message "hap.query"/></span>
+        <input type="text" class="k-textbox" data-bind="value:model.number" style="float:left;width:150px;margin-right:5px;">
+        <span class="btn btn-primary" style="float:left;width:70px;margin-right:5px;" data-bind="click:queryResource" type="submit"><@spring.message "hap.query"/></span>
+<!--
+        <span class="btn btn-primary" style="float:left;width:70px;margin-right:5px;" data-bind="click:queryResourceSql" type="submit">直连查询</span>
+-->
         <div style="clear:both"></div>
     </div>
     <script>kendo.bind($('#query-form'), viewModel);</script>
@@ -33,12 +44,13 @@
 </div>
 
 <script type="text/javascript">
-
+    var sqlurl="/bom/part/basic/att/query";
+kendo.bind($('#page-content'), viewModel);
     var BaseUrl = _basePath;
     dataSource = new kendo.data.DataSource({
         transport: {
             read: {
-                url: BaseUrl + "/bom/part/basic/att/query",
+                url: BaseUrl + sqlurl,
                 type: "POST",
                 dataType: "json"
             },
@@ -67,7 +79,7 @@
             }
         },
         batch: true,
-        serverPaging: true,
+        //serverPaging: true,
         pageSize: 10,
         schema: {
             data: 'rows',
@@ -93,11 +105,30 @@
             refresh: true,
             buttonCount: 5
         },
-        columns: [
+        columns: [    {
+            title: '详情(同步)',
+            width: 80,
+            locked:true,
+            template:function(dataItem)
+            {
+                var ids=JSON.stringify(dataItem);
+                var item=dataItem;
+                return "<a href='javascript:void(0);' onclick=showTree1('"+item.ida2a2+"','"+item.name+"','"+item.state+"','"+item.status+"','"+item.modifyer+"','"+item.number+"','"+item.version+"','"+item.modtime+"','"+item.view+"')>接口</a>"+"<a href='javascript:void(0);' onclick=showTree2('"+item.ida2a2+"','"+item.name+"','"+item.state+"','"+item.status+"','"+item.modifyer+"','"+item.number+"','"+item.version+"','"+item.modtime+"','"+item.view+"')>  直连</a>";
+            }
+        },  {
+            title: '详情',
+            width: 80,
+            locked:true,
+            template:function(dataItem)
+            {
+                var ids=JSON.stringify(dataItem);
+                var item=dataItem;
+                return "<a href='javascript:void(0);' onclick=showTree3('"+item.ida2a2+"','"+item.name+"','"+item.state+"','"+item.status+"','"+item.modifyer+"','"+item.number+"','"+item.version+"','"+item.modtime+"','"+item.view+"')>接口</a>"+"<a href='javascript:void(0);' onclick=showTree4('"+item.ida2a2+"','"+item.name+"','"+item.state+"','"+item.status+"','"+item.modifyer+"','"+item.number+"','"+item.version+"','"+item.modtime+"','"+item.view+"')>  直连</a>";
+            }
+        },
                     {
                 field: "ida2a2",
                 title: '<@spring.message "PartBasicAtt.ida2a2"/>',
-                        locked:true,
                 width: 120
             },
                     {
@@ -108,6 +139,11 @@
                     {
                 field: "number",
                 title: '<@spring.message "PartBasicAtt.number"/>',
+                width: 120
+            },
+            {
+                field: "view",
+                title: '视图',
                 width: 120
             },
                     {
@@ -153,21 +189,41 @@
                     {
                 field: "container",
                 title: '<@spring.message "PartBasicAtt.container"/>',
-                width: 120
-            },    {
-                title: '编辑',
-                width: 120,
-                template:function(dataItem)
-                {
-                    var ids=JSON.stringify(dataItem).replace(/\"/g,"\'");
-                    return '<a href="javascript:void(0);" onclick=getDetail('+ids+')>查看详情</a>';
-                }
+                width: 180
             }
         ],
         editable: true
     });
-    function getDetail(item)
+function showTree1(ida2a2,name,state,status,modifyer,number,version,modtime,view)
+{
+    parent.openTab('GET_BOMs1','同步获取BOMS(接口)', '${base.contextPath}/bom/soap.html?ida2a2='+ida2a2+'&name='+name+
+        '&state='+state+'&status='+status+'&modifyer='+modifyer+
+        '&number='+number+"&version="+version+"&modtime="+modtime+"&view="+view);
+
+}
+function showTree2(ida2a2,name,state,status,modifyer,number,version,modtime,view)
+{
+    parent.openTab('GET_BOMs2','同步获取BOMS(直连)', '${base.contextPath}/bom/sql.html?ida2a2='+ida2a2+'&name='+name+
+        '&state='+state+'&status='+status+'&modifyer='+modifyer+
+        '&number='+number+"&version="+version+"&modtime="+modtime+"&view="+view);
+}
+    function showTree3(ida2a2,name,state,status,modifyer,number,version,modtime,view)
     {
+        parent.openTab('GET_BOMs3','获取BOMS(接口)', '${base.contextPath}/bom/soapsync.html?ida2a2='+ida2a2+'&name='+name+
+            '&state='+state+'&status='+status+'&modifyer='+modifyer+
+            '&number='+number+"&version="+version+"&modtime="+modtime+"&view="+view);
+
+    }
+    function showTree4(ida2a2,name,state,status,modifyer,number,version,modtime,view)
+    {
+        parent.openTab('GET_BOMs4','获取BOMS(直连)', '${base.contextPath}/bom/sqlsync.html?ida2a2='+ida2a2+'&name='+name+
+            '&state='+state+'&status='+status+'&modifyer='+modifyer+
+            '&number='+number+"&version="+version+"&modtime="+modtime+"&view="+view);
+    }
+   /* function getDetail(ida2a2,name,state,status,modifyer,number,version,modtime)
+    {
+        $('#Grid').data('kendoGrid').dataSource.page(1);
+        var title = number+'-详细信息';
         var dialog = $("#detaildialog")
             .kendoWindow(
                 {
@@ -175,15 +231,14 @@
                     width: 920,
                     height: 450,
                     modal: true,
-                    title: item.ida2a2+'-详细信息',
                     visible: false,
                     iframe: true,
-                    content: 'employees.html?ida2a2='+item.ida2a2+'&name='+item.name+
-                        '&state='+item.state+'&status='+item.status+'&modifyer='+item.modifyer+
-                        '&number='+item.number+"&version="+item.version+"&modtime="+item.modtime
-                }).data("kendoWindow");
+                    content: 'employees.html?ida2a2='+ida2a2+'&name='+name+
+                        '&state='+state+'&status='+status+'&modifyer='+modifyer+
+                        '&number='+number+"&version="+version+"&modtime="+modtime
+                }).data("kendoWindow").title(title);
         dialog.maximize().open();
-    }
+    }*/
     function deleteData() {
 
         Hap.deleteGridSelection({

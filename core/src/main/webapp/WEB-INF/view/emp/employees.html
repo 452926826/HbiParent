@@ -1,0 +1,39 @@
+<#include "../include/header.html">
+
+<body>
+<div id="page-content">
+    <div id="dialog"></div>
+</div>
+
+<script type="text/javascript">
+
+    changeParent();
+    function changeParent()
+    {
+        var dialog = $("#dialog").kendoWindow({
+            actions: ["Close"],
+//            animation: {
+//                close: {
+//                    effects: "fadeOut zoom:out",
+//                    duration: 300
+//                },
+//                open: {
+//                    effects: "fadeIn zoom:in",
+//                    duration: 300
+//                }
+//            },
+            width: '100%',
+            height: '100%',
+            title: 'JSP',
+            visible: false,
+            iframe: true,
+            modal: true,
+            content: 'http://plm.teg.cn/Windchill/netmarkets/jsp/csr/software/viewSoftWareBorrowInfo.jsp?ContainerOid=OR%3Awt.inf.library.WTLibrary%3A294337129&u8=1&componentType=INFO&unique_page_number=447&AjaxEnabled=component&tableID=null&actionName=viewSoftWareBorrowInfo&portlet=poppedup&context=servlet%24TypeBasedIncludeServlet%24VR%3Awt.doc.WTDocument%3A2187804319%24&oid=VR%3Awt.doc.WTDocument%3A2187804319'
+        }).data("kendoWindow");
+        dialog.center().open();
+    }
+
+
+</script>
+</body>
+</html>

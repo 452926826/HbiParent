@@ -5,6 +5,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import com.hand.hap.mybatis.annotation.ExtensionAttribute;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import com.hand.hap.system.dto.BaseDTO;
 @ExtensionAttribute(disable=true)
 @Table(name = "bom_bom")
@@ -86,14 +88,14 @@ public class Bom extends BaseDTO {
 
       private String weight;
 
-      private Long demoid;
+      private String parentid;
 
-    public Long getDemoid() {
-        return demoid;
+    public String getParentid() {
+        return parentid;
     }
 
-    public Bom setDemoid(Long demoid) {
-        this.demoid = demoid;
+    public Bom setParentid(String parentid) {
+        this.parentid = parentid;
         return this;
     }
 

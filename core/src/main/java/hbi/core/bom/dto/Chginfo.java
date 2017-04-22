@@ -25,8 +25,37 @@ public class Chginfo extends BaseDTO {
 
       private String softwaresol;
 
+      private String userOid;
 
-     public void setChginfoId(Long chginfoId){
+      private String username;
+
+      private String number;
+
+    public String getUserOid() {
+        return userOid;
+    }
+
+    public void setUserOid(String userOid) {
+        this.userOid = userOid;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getNumber() {
+        return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
+    }
+
+    public void setChginfoId(Long chginfoId){
          this.chginfoId = chginfoId;
      }
 

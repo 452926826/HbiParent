@@ -9,7 +9,38 @@
         <result column="soid" property="soid" jdbcType="VARCHAR" />
         <result column="result" property="result" jdbcType="VARCHAR" />
         <result column="description" property="description" jdbcType="VARCHAR" />
+
+        <result column="number" property="number" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="type" property="type" jdbcType="VARCHAR" />
+        <result column="version" property="version" jdbcType="VARCHAR" />
+        <result column="state" property="state" jdbcType="VARCHAR" />
+        <result column="modifyer" property="modifyer" jdbcType="VARCHAR" />
+        <result column="isauthen" property="isauthen" jdbcType="VARCHAR" />
+        <result column="authenpart" property="authenpart" jdbcType="VARCHAR" />
     </resultMap>
 
-
+    <select id="queryBasic" resultMap="BaseResultMap" parameterType="hbi.core.bom.dto.Revise">
+        SELECT
+        br.REVISE_ID,
+        br.CHGINFO_ID,
+        br.oid,
+        br.soid,
+        br.result,
+        br.description,
+        br.OBJECT_VERSION_NUMBER,
+        br.number,
+        br.name,
+        br.type,
+        br.version,
+        br.state,
+        br.modifyer
+        FROM
+        bom_revise AS br
+        <where>
+            <if test="chginfoId!=null">
+                AND CHGINFO_ID = #{chginfoId}
+            </if>
+        </where>
+    </select>
 </mapper>

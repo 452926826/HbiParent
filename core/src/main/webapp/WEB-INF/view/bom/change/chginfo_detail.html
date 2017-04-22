@@ -1,0 +1,1431 @@
+<#--
+    * description: 新建(详情)变更任务页面
+    * version: 3.0
+    * author:zixi.xie@hand-china.com
+-->
+<#include "../../include/header.html">
+<style>
+    #tool-btn{
+        position: fixed;
+        z-index: 1000;
+        width: 100%;
+        top:0;
+    }
+    #tool-btn span.btn{
+        margin: 5px;
+    }
+    .bg-bar{
+        position: relative;
+        background: #f9f9f9;
+        height: 30px;
+        line-height: 30px;
+        border-bottom: 1px solid #ccc;
+    }
+    .bar-left{
+        padding-left: 10px;
+    }
+    .panel{
+        margin-bottom: 0;
+    }
+    .panel>.row{
+        margin: 10px auto;
+    }
+    label.col-sm-3.control-label {
+        text-align: right;
+        padding-top: 7px;
+    }
+    .bar-btn{
+        position: absolute;
+        text-align: center;
+        right: 10px;
+        top:5px;
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+    .bar-btn>span{
+        font-size:22px;
+    }
+    .k-grid td {
+        line-height: 1.5 !important;
+    }
+</style>
+<script src="${base.contextPath}/lib/jszip.min.js"></script>
+<script>
+    //获取查询页面传递过来的chginfoId
+    //0->新建状态 !0更新状态
+    var chginfoId = '${RequestParameters.chginfoId!0}';
+    var copyObj = {};
+    var addObjectStr = "";
+
+    //是否
+    var yesNoDataSource = [
+        {"value":"是"},
+        {"value":"否"}
+    ];
+
+    var selectDataSource = [
+        {"value":"报废"},
+        {"value":"按图改制"},
+        {"value":"不处理，用完为止"},
+        {"value":"按备注说明执行"}
+    ];
+
+    var selectDataSource2 = [
+        {"value":"无需变更"},
+        {"value":"重新下发"}
+    ];
+
+
+
+    if (chginfoId!=0){
+        //更新
+        //获取主数据
+        $.ajax({
+            url:"${base.contextPath}/bom/chginfo/query?chginfoId="+chginfoId,
+            dataType:"json",
+            contentType:"application/json",
+            success:function (data) {
+                var basicData = data.rows[0] || {};
+                for (var k in basicData) {
+                    chginfo_viewModel.model.set(k, basicData[k]);
+                }
+            }
+        });
+
+    }else {
+        //新建
+    }
+
+    //基本信息viewModel
+    var chginfo_viewModel = kendo.observable({
+        model: {
+        },
+        //保存方法
+        saveFunction:function (e) {
+            e.preventDefault();
+            var dataModel = chginfo_viewModel.model;
+            var flag = dataModel.name==null||dataModel.processor==null||dataModel.inworksol==null||dataModel.softwaresol==null||dataModel.stocksol==null||dataModel.testsol==null;
+            if(flag){
+                kendo.ui.showWarningDialog({
+                    message:"请将信息填写完整"
+                });
+            }else {
+                if(chginfoId!=0){
+                    //更新
+                    chginfo_viewModel.model.set("__status","update");
+                    Hap.submitForm({
+                        url: '${base.contextPath}/bom/chginfo/submit',
+                        formModel: chginfo_viewModel.model,
+                        success: function (json){
+                            if(json.success){
+                                kendo.ui.showInfoDialog({
+                                    message: "成功"
+                                });
+                            }else{
+                                kendo.ui.showErrorDialog({
+                                    message: "失败"
+                                });
+                            }
+                        }
+                    });
+                }else {
+                    //新建
+                    chginfo_viewModel.model.set("__status","add");
+                    Hap.submitForm({
+                        url: '${base.contextPath}/bom/chginfo/submit',
+                        formModel: chginfo_viewModel.model,
+                        success: function (data){
+                            if(data.success){
+                                kendo.ui.showInfoDialog({
+                                    message: "成功"
+                                }).done(function () {
+                                    var chginfoId = data.rows[0].chginfoId;
+                                    parent.openTab('BOM_UPDATE'+chginfoId,'更新变更任务', '${base.contextPath}/bom/change/chginfo_detail.html?chginfoId='+chginfoId);
+                                    parent.closeTab('BOM_CHANGE_CREATE');
+                                });
+                            }else {
+                                kendo.ui.showErrorDialog({
+                                    message: data.message
+                                });
+                            }
+                        }
+                    });
+                }
+            }
+
+
+        },
+        //复制通用意见到受影响对象中方法
+        copyFunction:function (e) {
+            e.preventDefault();
+            var grid = $("#effectObject-Grid").data("kendoGrid");
+            var checked = grid.selectedDataItems();
+            if(checked.length==0){
+                kendo.ui.showInfoDialog({
+                    message: "请至少选择一行"
+                })
+            }else {
+                for (var i = 0;i<checked.length;i++){
+                    checked[i].inworksol=chginfo_viewModel.model.inworksol;
+                    checked[i].stocksol=chginfo_viewModel.model.stocksol;
+                    checked[i].testsol=chginfo_viewModel.model.testsol;
+                    checked[i].softwaresol=chginfo_viewModel.model.softwaresol;
+                    //设置为脏数据自动更新
+                    checked[i].dirty=true;
+                }
+                grid.refresh();
+            }
+        }
+    });
+
+    //添加受影响的对象viewModel
+    var effectObject_viewModel = kendo.observable({
+        model: {
+        },
+        //保存方法
+        saveFunction: function () {
+            $('#effectObject-Grid').data('kendoGrid').saveChanges();
+        },
+        //删除方法
+        deleteFunction:function (e) {
+            var grid = $("#effectObject-Grid").data("kendoGrid");
+            var checked = grid.selectedDataItems();
+            if(checked.length==0){
+                kendo.ui.showInfoDialog({
+                    message: "请至少选择一行"
+                })
+            }else {
+                Hap.deleteGridSelection({
+                    grid: $('#effectObject-Grid')
+                });
+            }
+        }
+    });
+
+    //产生对象viewModel
+    var reviseObject_viewModel = kendo.observable({
+        model: {
+        },
+        //保存方法
+        saveFunction: function () {
+            $('#reviseObject-Grid').data('kendoGrid').saveChanges();
+        },
+        //删除方法
+        deleteFunction:function () {
+            var grid = $("#reviseObject-Grid").data("kendoGrid");
+            var checked = grid.selectedDataItems();
+            if(checked.length==0){
+                kendo.ui.showInfoDialog({
+                    message: "请至少选择一行"
+                })
+            }else {
+                Hap.deleteGridSelection({
+                    grid: $('#reviseObject-Grid')
+                });
+            }
+        }
+    });
+
+    //被删除物料处理意见viewModel
+    var deleteObject_viewModel = kendo.observable({
+        model: {
+        },
+        //查询方法
+        queryResource: function (e) {
+
+            var selection = $('#reviseObject-Grid').data('kendoGrid').selectedDataItems();
+            if(selection.length<1) {
+                selection=$('#reviseObject-Grid').data('kendoGrid').dataSource._data;
+            }
+           // var dataObj_deleteObject = [];
+            var param="{del:[";
+            for (var y = 0; y < selection.length; y++) {
+                /*dataObj_deleteObject.push({
+                    "__status": "add",
+                    oid: selection[y].oid,
+                    soid:selection[y].soid
+                });*/
+                if(y==selection.length-1)
+                {
+                    param+="{soid:'"+selection[y].soid+"',toid:'"+selection[y].oid+"'}";
+                }else
+                {
+                    param+="{soid:'"+selection[y].soid+"',toid:'"+selection[y].oid+"'},";
+                }
+            }
+            param+="]}"
+            $.ajax({
+                url: BaseUrl + "/bom/delete/part/sync?param="+encodeURI(param),
+                type: "POST",
+                success: function (json) {
+                    if (json.success) {
+                        kendo.ui.showInfoDialog({
+                            message: json.message
+                        }).done(function () {
+                            $("#deleteObject-Grid .k-i-refresh").trigger("click");
+                        });
+                    } else {
+                        kendo.ui.showInfoDialog({
+                            message: json.message
+                        })
+                    }
+                }
+            });
+            e.preventDefault();
+            $('#deleteObject-Grid').data('kendoGrid').dataSource.page(1);
+        },
+        //保存方法
+        saveFunction: function () {
+            $('#deleteObject-Grid').data('kendoGrid').saveChanges();
+        },
+    });
+
+</script>
+<body>
+<!--收缩展开-->
+<div id="tool-btn">
+    <div class="bg-bar">
+        <span class="bar-left">变更任务</span>
+    </div>
+    <div class="panel" style="box-shadow: 0 0 2px;">
+        <span class="btn btn-primary"><i class="fa fa-compress" style="margin-right:3px;"></i>全部收缩</span>
+        <span class="btn btn-danger"><i class="fa fa-expand" style="margin-right:3px;"></i>全部展开</span>
+    </div>
+</div>
+<!--基本信息-->
+<div id="basic-info" style="margin-top: 72px;">
+    <div class="bg-bar">
+        <span class="bar-left">基本信息</span>
+        <div class="bar-btn">
+            <span class="fa fa-angle-double-up"></span>
+        </div>
+    </div>
+    <div class="panel">
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label for="info-name" class="col-sm-3 control-label">变更任务名称：</label>
+                    <div class="col-sm-9">
+                        <input id="info-name" data-bind="value:model.name" type="text" class="k-textbox" style="width:100%">
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label for="info-processor" class="col-sm-3 control-label">工作负责人：</label>
+                    <div class="col-sm-9">
+                        <input type="text" data-bind="value:model.processor" id="info-processor"
+                               style="width:76%;float: left;" class="k-textbox" readonly>
+                        <span class="btn btn-default" id="show-user-dialog"
+                              style="width:24%;float: left;">搜索用户</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label for="inworksol" class="col-sm-3 control-label">在制品处理意见：</label>
+                    <div class="col-sm-9">
+                        <input id="inworksol" data-bind="value:model.inworksol" style="width:100%">
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label for="stocksol" class="col-sm-3 control-label">库存处理意见：</label>
+                    <div class="col-sm-9">
+                        <input id="stocksol" data-bind="value:model.stocksol" style="width:100%">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label for="testsol" class="col-sm-3 control-label">试验大纲处理意见：</label>
+                    <div class="col-sm-9">
+                        <input id="testsol" data-bind="value:model.testsol" style="width:100%">
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label for="softwaresol" class="col-sm-3 control-label">软件处理意见：</label>
+                    <div class="col-sm-9">
+                        <input id="softwaresol" data-bind="value:model.softwaresol" style="width:100%">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="pull-right">
+                    <!--复制通用意见到受影响对象中-->
+                    <span class="btn btn-primary" data-bind="click:copyFunction"  style="width:220px;float:left;margin: 5px;"
+                          type="submit"><i class="fa fa-copy" style="margin-right:3px;"></i>复制通用意见到受影响对象中</span>
+                    <!--保存-->
+                    <span id="save-btn" data-bind="click:saveFunction" class="btn btn-success"
+                          style="float:left;margin: 5px;"><i class="fa fa-save" style="margin-right:5px;"></i><@spring.message "hap.save"/></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--添加受影响的对象-->
+<div id="effectObject">
+    <div class="bg-bar">
+        <span class="bar-left">添加受影响对象 <span style="color: #f00;">(温馨提示:以下红色标题点击可填写)</span></span>
+        <div class="bar-btn">
+            <span class="fa fa-angle-double-up"></span>
+        </div>
+    </div>
+    <div class="panel">
+        <div class="clearfix" style="margin: 5px;">
+            <!--新建修订版本-->
+            <span style="float:left;margin-right:3px;" class="btn btn-info"
+                  id="revise-btn"><i class="fa fa-plus-square"
+                                                     style="margin-right:3px;"></i>新建修订版本</span>
+            <!--导出受影响的对象-->
+            <span style="float:left;margin-right:3px;" class="btn btn-default"
+                  id="effectObject-excel-out-btn"><i class="fa fa-file-excel-o"
+                                               style="margin-right:3px;"></i>导出受影响的对象</span>
+            <!--导入受影响的对象-->
+            <span style="float:left;margin-right:3px;" class="btn btn-default"
+                  id="effectObject-excel-in-btn"><i class="fa fa-file-excel-o"
+                                                     style="margin-right:3px;"></i>导入受影响的对象</span>
+            <!--添加-->
+            <span style="float:left;margin-right:3px;" class="btn btn-primary"
+                id="effectObject-add-btn"><i class="fa fa-plus-square"
+                                       style="margin-right:3px;"></i>添加</span>
+            <!--保存-->
+            <span style="float:left;margin-right:3px;" class="btn btn-success"
+                  data-bind="click:saveFunction">
+            <i class="fa fa-save" style="margin-right:3px;"></i>保存</span>
+            <!--删除-->
+            <span style="float:left;margin-right:3px;" class="btn btn-danger"
+                  data-bind="click:deleteFunction"><i
+            class="fa fa-trash-o" style="margin-right:3px;"></i><@spring.message "hap.delete"/></span>
+            <!--复制-->
+            <span style="float:left;margin-right:3px;" class="btn btn-primary"
+                  id="effectObject-copy-btn"><i class="fa fa-copy" style="margin-right:3px;"></i>复制</span>
+            <!--粘贴-->
+            <span style="float:left;margin-right:3px;" class="btn btn-primary"
+                  id="effectObject-paste-btn"><i class="fa fa-clipboard" style="margin-right:3px;"></i>粘贴</span>
+            <!--变更对象下层关键件信息查询-->
+            <span style="float:left;margin-right:3px;" class="btn btn-warning"
+                  id="show-detail-btn"><i class="fa fa-calendar-minus-o" style="margin-right:3px;"></i>关键件信息查询</span>
+        </div>
+        <div id="effectObject-Grid">
+
+        </div>
+    </div>
+</div>
+
+<!--产生对象-->
+<div id="reviseObject">
+    <div class="bg-bar">
+        <span class="bar-left">产生对象 <span style="color: #f00;">(温馨提示:以下红色标题点击可填写)</span></span>
+        <div class="bar-btn">
+            <span class="fa fa-angle-double-up"></span>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="clearfix" style="margin: 5px;">
+            <!--导出-->
+            <span style="float:left;margin-right:5px;" class="btn btn-default"
+                  id="reviseObject-excel-out-btn"><i class="fa fa-file-excel-o"
+                                                     style="margin-right:3px;"></i>导出实例BOM确认表</span>
+            <!--导入-->
+            <span style="float:left;margin-right:5px;" class="btn btn-default"
+                  id="reviseObject-excel-in-btn"><i class="fa fa-file-excel-o"
+                                                    style="margin-right:3px;"></i>导入实例BOM变更表</span>
+            <!--添加-->
+            <span style="float:left;margin-right:5px;" class="btn btn-primary"
+                  id="reviseObject-add-btn"><i class="fa fa-plus-square"
+                                               style="margin-right:3px;"></i>添加</span>
+            <!--保存-->
+            <span style="float:left;margin-right:5px;" class="btn btn-success"
+                  data-bind="click:saveFunction">
+            <i class="fa fa-save" style="margin-right:3px;"></i>保存</span>
+
+            <!--删除-->
+            <span style="float:left;margin-right:5px;" class="btn btn-danger"
+                  data-bind="click:deleteFunction"><i
+                    class="fa fa-trash-o" style="margin-right:3px;"></i><@spring.message "hap.delete"/></span>
+        </div>
+        <div id="reviseObject-Grid">
+
+        </div>
+    </div>
+</div>
+
+<!--被删除物料处理意见-->
+<div id="deleteObject">
+    <div class="bg-bar">
+        <span class="bar-left">被删除物料处理意见<span style="color: #f00;">(温馨提示:以下红色标题点击可填写)</span></span>
+        <div class="bar-btn">
+            <span class="fa fa-angle-double-up"></span>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="clearfix" style="margin: 5px;">
+            <!--获取-->
+            <span style="float:left;margin-right:5px;" class="btn btn-info"
+                  data-bind="click:queryResource">
+            <i class="fa fa-hand-pointer-o" style="margin-right:3px;"></i>获取</span>
+            <!--保存-->
+            <span style="float:left;margin-right:5px;" class="btn btn-success"
+                  data-bind="click:saveFunction">
+            <i class="fa fa-save" style="margin-right:3px;"></i>保存</span>
+        </div>
+        <div id="deleteObject-Grid">
+
+        </div>
+    </div>
+</div>
+
+
+<!--确定按钮-->
+<div id="confirm-btn" style="float: right">
+    <span class="btn btn-primary" style="margin: 5px;">
+    <i class="fa fa-check-square-o" style="margin-right:3px;"></i>确定</span>
+</div>
+<!--搜索用户-->
+<#include "select_user.html">
+<!--添加对象-->
+<#include "select_object.html">
+<!--变更对象下层关键信息查询-->
+<#include "show_keypart.html">
+<!-- 导入导出的excel Window -->
+<div id="excelWindow"></div>
+<!-- 导入导出的excel Window--产生对象 -->
+<div id="excelWindow_revise"></div>
+
+<script>
+    var BaseUrl = _basePath;
+
+
+
+
+    //绑定viewModel
+    kendo.bind($('#basic-info'), chginfo_viewModel);
+    kendo.bind($('#effectObject'), effectObject_viewModel);
+    kendo.bind($('#reviseObject'), reviseObject_viewModel);
+    kendo.bind($('#deleteObject'), deleteObject_viewModel);
+
+    //全部收缩
+    $("#tool-btn span.btn-primary").on("click",function (e) {
+        e.preventDefault();
+        $("#basic-info,#effectObject,#reviseObject,#deleteObject").find(".panel").hide(0);
+        $("#basic-info,#effectObject,#reviseObject,#deleteObject").find(".bar-btn").find("span").removeClass("fa fa-angle-double-up").addClass("fa fa-angle-double-down");
+    });
+
+    //全部展开
+    $("#tool-btn span.btn-danger").on("click",function (e) {
+        e.preventDefault();
+        $("#basic-info,#effectObject,#reviseObject,#deleteObject").find(".panel").show(0);
+        $("#basic-info,#effectObject,#reviseObject,#deleteObject").find(".bar-btn").find("span").removeClass("fa fa-angle-double-down").addClass("fa fa-angle-double-up");
+    });
+
+
+    /**
+     * 模块一:基本信息
+     */
+    //初始化下拉框
+    $("#inworksol,#stocksol").kendoComboBox({
+        filter: "contains",
+        valuePrimitive: true,
+        dataTextField : "value",
+        dataValueField : "value",
+        dataSource : selectDataSource
+    });
+    $("#testsol,#softwaresol").kendoComboBox({
+        filter: "contains",
+        valuePrimitive: true,
+        dataTextField : "value",
+        dataValueField : "value",
+        dataSource : selectDataSource2
+    });
+
+    //基本信息收缩展开
+    $("#basic-info").on("click",".bar-btn",function (e) {
+        e.preventDefault();
+        var classStr = $(this).find("span").attr("class")=='fa fa-angle-double-up'?'fa fa-angle-double-down':'fa fa-angle-double-up';
+        $(this).find("span").removeClass().addClass(classStr);
+        $("#basic-info").find(".panel").toggle(0);
+    });
+
+
+    /**
+     * 模块二:添加受影响对象
+     */
+    //受影响对象数据源
+    var effectObject_dataSource = new kendo.data.DataSource({
+        transport: {
+            read: {
+                url: BaseUrl + "/bom/effect/object/queryBasic?chginfoId="+chginfoId,
+                type: "POST",
+                dataType: "json"
+            },
+            update: {
+                url: BaseUrl + "/bom/effect/object/submit",
+                type: "POST",
+                contentType: "application/json"
+            },
+            destroy: {
+                url: BaseUrl + "/bom/effect/object/remove",
+                type: "POST",
+                contentType: "application/json"
+            },
+            create: {
+                url: BaseUrl + "/bom/effect/object/submit",
+                type: "POST",
+                contentType: "application/json"
+            },
+            parameterMap: function (options, type) {
+                if (type !== "read" && options.models) {
+                    var datas = Hap.prepareSubmitParameter(options, type)
+                    return kendo.stringify(datas);
+                } else if (type === "read") {
+                    return Hap.prepareQueryParameter(effectObject_viewModel.model.toJSON(), options)
+                }
+            }
+        },
+        batch: true,
+        serverPaging: true,
+        pageSize: 10,
+        schema: {
+            data: 'rows',
+            total: 'total',
+            model: {
+                id: "objectId",
+                fields: {},
+                editable:function (col) {
+                    if(col=="number"||col=="name"||col=="type"||col=="version"||col=="state"||col=="isauthen"||col=="authenpart"){
+                        return false;
+                    }else {
+                        return true;
+                    }
+                }
+            }
+        }
+    });
+
+    //受影响对象表格
+    $("#effectObject-Grid").kendoGrid({
+        excel:{
+            allPages:true,
+            fileName: "受影响的对象.xlsx"
+        },
+        dataSource: effectObject_dataSource,
+        height: 300,
+        resizable: true,
+        scrollable: true,
+        navigatable: false,
+        selectable: 'multiple, rowbox',
+        pageable: {
+            pageSizes: [5, 10, 20, 50],
+            refresh: true,
+            buttonCount: 5
+        },
+        columns: [
+            {
+                field: "oid",
+                title: 'oid',
+                width: 150,
+                attributes: {style: "text-align:center"},
+                headerAttributes: {
+                    "class": "table-header-cell",
+                    style: "text-align: center"
+                }
+            },
+            {
+                field: "number",
+                title: '编号',
+                width: 120,
+                attributes: {style: "text-align:center"},
+                headerAttributes: {
+                    "class": "table-header-cell",
+                    style: "text-align: center"
+                }
+            },
+            {
+                field: "name",
+                title: '名称',
+                width: 120,
+                attributes: {style: "text-align:center"},
+                headerAttributes: {
+                    "class": "table-header-cell",
+                    style: "text-align: center"
+                }
+            },
+            {
+                field: "type",
+                title: '类型',
+                width: 120,
+                attributes: {style: "text-align:center"},
+                headerAttributes: {
+                    "class": "table-header-cell",
+                    style: "text-align: center"
+                }
+            },
+            {
+                field: "version",
+                title: '版本',
+                width: 120,
+                attributes: {style: "text-align:center"},
+                headerAttributes: {
+                    "class": "table-header-cell",
+                    style: "text-align: center"
+                }
+            },
+            {
+                field: "state",
+                title: '状态',
+                width: 120,
+                attributes: {style: "text-align:center"},
+                headerAttributes: {
+                    "class": "table-header-cell",
+                    style: "text-align: center"
+                }
+            },
+            {
+                field: "chgdescription",
+                title: '变更描述',
+                width: 120,
+                attributes: {style: "text-align:center"},
+                headerAttributes: {
+                    "class": "table-header-cell",
+                    style: "text-align: center;color:#f00;"
+                }
+            },
+            {
+                field: "inworksol",
+                title: '在制品处理意见',
+                width: 120,
+                attributes: {style: "text-align:center"},
+                headerAttributes: {
+                    "class": "table-header-cell",
+                    style: "text-align: center;color:#f00;"
+                },
+                editor: function (container, options) {
+                    $('<input name="' + options.field + '"/>')
+                        .appendTo(container)
+                        .kendoDropDownList({
+                            filter: "contains",
+                            valuePrimitive: true,
+                            dataTextField : "value",
+                            dataValueField : "value",
+                            dataSource : selectDataSource
+                        });
+                }
+            },
+            {
+                field: "stocksol",
+                title: '库存处理意见',
+                width: 120,
+                attributes: {style: "text-align:center"},
+                headerAttributes: {
+                    "class": "table-header-cell",
+                    style: "text-align: center;color:#f00;"
+                },
+                editor: function (container, options) {
+                    $('<input name="' + options.field + '"/>')
+                        .appendTo(container)
+                        .kendoDropDownList({
+                            filter: "contains",
+                            valuePrimitive: true,
+                            dataTextField : "value",
+                            dataValueField : "value",
+                            dataSource : selectDataSource
+                        });
+                }
+            },
+            {
+                field: "softwaresol",
+                title: '软件处理意见',
+                width: 120,
+                attributes: {style: "text-align:center"},
+                headerAttributes: {
+                    "class": "table-header-cell",
+                    style: "text-align: center;color:#f00;"
+                },
+                editor: function (container, options) {
+                    $('<input name="' + options.field + '"/>')
+                        .appendTo(container)
+                        .kendoDropDownList({
+                            filter: "contains",
+                            valuePrimitive: true,
+                            dataTextField : "value",
+                            dataValueField : "value",
+                            dataSource : selectDataSource2
+                        });
+                }
+            },
+            {
+                field: "testsol",
+                title: '试验大纲处理意见',
+                width: 120,
+                attributes: {style: "text-align:center"},
+                headerAttributes: {
+                    "class": "table-header-cell",
+                    style: "text-align: center;color:#f00;"
+                },
+                editor: function (container, options) {
+                    $('<input name="' + options.field + '"/>')
+                        .appendTo(container)
+                        .kendoDropDownList({
+                            filter: "contains",
+                            valuePrimitive: true,
+                            dataTextField : "value",
+                            dataValueField : "value",
+                            dataSource : selectDataSource2
+                        });
+                }
+            },
+            {
+                field: "isdeletema",
+                title: '是否删除物料',
+                width: 120,
+                attributes: {style: "text-align:center"},
+                headerAttributes: {
+                    "class": "table-header-cell",
+                    style: "text-align: center;color:#f00;"
+                },
+                editor: function (container, options) {
+                    $('<input name="' + options.field + '"/>')
+                        .appendTo(container)
+                        .kendoDropDownList({
+                            filter: "contains",
+                            valuePrimitive: true,
+                            dataTextField : "value",
+                            dataValueField : "value",
+                            dataSource : yesNoDataSource
+                        });
+                }
+            },
+            {
+                field: "isauthen",
+                title: '是否认证产品',
+                width: 120,
+                attributes: {style: "text-align:center"},
+                headerAttributes: {
+                    "class": "table-header-cell",
+                    style: "text-align: center"
+                }
+            },
+            {
+                field: "authenpart",
+                title: '认证关键件所属产品',
+                width: 150,
+                attributes: {style: "text-align:center"},
+                headerAttributes: {
+                    "class": "table-header-cell",
+                    style: "text-align: center"
+                }
+            },
+            {
+                field: "description",
+                title: '备注信息',
+                width: 120,
+                attributes: {style: "text-align:center"},
+                headerAttributes: {
+                    "class": "table-header-cell",
+                    style: "text-align: center;color:#f00;"
+                }
+            },
+        ],
+        editable: true
+    });
+
+    //添加受影响对象收缩展开
+    $("#effectObject").on("click",".bar-btn",function (e) {
+        e.preventDefault();
+        var classStr = $(this).find("span").attr("class")=='fa fa-angle-double-up'?'fa fa-angle-double-down':'fa fa-angle-double-up';
+        $(this).find("span").removeClass().addClass(classStr);
+        $("#effectObject").find(".panel").toggle(0);
+    });
+
+    //复制受影响对象
+    $("#effectObject-copy-btn").click(function (e) {
+        e.preventDefault();
+        var selection = $('#effectObject-Grid').data('kendoGrid').selectedDataItems();
+        if(selection.length!=1){
+            kendo.ui.showInfoDialog({
+                message:"请选择一条数据"
+            });
+        }else {
+            copyObj.chgdescription = selection[0].chgdescription;
+            copyObj.isdeletema = selection[0].isdeletema;
+            copyObj.inworksol = selection[0].inworksol;
+            copyObj.stocksol = selection[0].stocksol;
+            copyObj.testsol = selection[0].testsol;
+            copyObj.softwaresol = selection[0].softwaresol;
+            kendo.ui.showInfoDialog({
+                message:"复制成功"
+            });
+        }
+    });
+
+    //粘贴受影响对象
+    $("#effectObject-paste-btn").click(function (e) {
+        e.preventDefault();
+        var grid = $("#effectObject-Grid").data("kendoGrid");
+        var checked = grid.selectedDataItems();
+        if(checked.length==0){
+            kendo.ui.showInfoDialog({
+                message: "请至少选择一行"
+            })
+        }else if(copyObj.isdeletema===undefined){
+            kendo.ui.showInfoDialog({
+                message: "请先复制"
+            })
+        }else {
+            for (var i = 0;i<checked.length;i++){
+                checked[i].chgdescription=copyObj.chgdescription;
+                checked[i].isdeletema=copyObj.inworksol;
+                checked[i].inworksol=copyObj.inworksol;
+                checked[i].stocksol=copyObj.stocksol;
+                checked[i].testsol=copyObj.testsol;
+                checked[i].softwaresol=copyObj.softwaresol;
+                //设置为脏数据自动更新
+                checked[i].dirty=true;
+            }
+            kendo.ui.showInfoDialog({
+                message: "粘贴成功"
+            }).done(function () {
+                grid.refresh();
+            });
+        }
+    });
+
+    //导入excel窗口初始化
+    window.excelWindow = function(){
+        var excelWindow = $("#excelWindow").kendoWindow({
+            title: '受影响对象的导入',
+            content:"${base.contextPath}/bom/change/import_excel.html?chginfoId="+chginfoId,
+            actions: [
+                "Pin",
+                "Close"
+            ],
+            modal:true,
+            visible:false,
+            iframe:true,
+            close: function() {
+                //window 关闭  刷新 本页面的  Grid
+                $('#effectObject-Grid').data('kendoGrid').dataSource.page(1);
+            }
+        }).data("kendoWindow");
+        excelWindow.center().open();
+        //最大化
+        excelWindow.toggleMaximization();
+    }
+
+    //导出excel
+    $("#effectObject-excel-out-btn").click(function(e) {
+        e.preventDefault();
+        var grid = $("#effectObject-Grid").data("kendoGrid");
+        grid.saveAsExcel();
+    });
+
+    //导入excel
+    $("#effectObject-excel-in-btn").click(function(e) {
+        e.preventDefault();
+        excelWindow();
+    });
+
+    //新建修订版本
+    $("#revise-btn").click(function (e) {
+        e.preventDefault();
+        var selection = $('#effectObject-Grid').data('kendoGrid').selectedDataItems();
+        if(selection.length==0){
+            kendo.ui.showInfoDialog({
+                message:"请至少选择一条数据"
+            });
+        }else {
+            /**
+             * 前端唯一性校验
+             */
+            var oidArr = [];
+            var flag = false;//是否含有相同数据标识[false未含,true含有]
+            //添加受影响对象
+            for(var i =0;i<reviseObject_dataSource._data.length;i++){
+                oidArr.push(reviseObject_dataSource._data[i].oid);
+            }
+            for (var j =0;j<selection.length;j++){
+                if (oidArr.indexOf(selection[j].oid)!=-1){
+                    flag = true;
+                    break;
+                }
+            }
+            if(flag){
+                kendo.ui.showInfoDialog({
+                    message:"数据重复"
+                });
+            }else {
+                var dataObj_reviseObject = [];
+                for (var y = 0; y < selection.length; y++) {
+                    dataObj_reviseObject.push({
+                        "__status": "add",
+                        chginfoId: chginfoId,
+                        oid: selection[y].oid,
+                        number:selection[y].number,
+                        name:selection[y].name,
+                        type:selection[y].type
+                    });
+                }
+                //插入到产生对象
+                $.ajax({
+                    url: BaseUrl + "/bom/revise/submitUpdate",
+                    type: "POST",
+                    contentType: "application/json",
+                    dataType: "json",
+                    data: JSON.stringify(dataObj_reviseObject),
+                    success: function (json) {
+                        if (json.success) {
+                            kendo.ui.showInfoDialog({
+                                message: json.message
+                            }).done(function () {
+                                $("#reviseObject-Grid .k-i-refresh").trigger("click");
+                            });
+                        } else {
+                            kendo.ui.showInfoDialog({
+                                message:  json.message
+                            })
+                        }
+                    }
+                });
+            }
+        }
+    });
+
+    /**
+     * 模块三:产生对象
+     */
+    //产生对象数据源
+    var reviseObject_dataSource = new kendo.data.DataSource({
+        transport: {
+            read: {
+                url: BaseUrl + "/bom/revise/queryBasic?chginfoId="+chginfoId,
+                type: "POST",
+                dataType: "json"
+            },
+            update: {
+                url: BaseUrl + "/bom/revise/submit",
+                type: "POST",
+                contentType: "application/json"
+            },
+            destroy: {
+                url: BaseUrl + "/bom/revise/remove",
+                type: "POST",
+                contentType: "application/json"
+            },
+            create: {
+                url: BaseUrl + "/bom/revise/submit",
+                type: "POST",
+                contentType: "application/json"
+            },
+            parameterMap: function (options, type) {
+                if (type !== "read" && options.models) {
+                    var datas = Hap.prepareSubmitParameter(options, type);
+                    return kendo.stringify(datas);
+                } else if (type === "read") {
+                    return Hap.prepareQueryParameter(reviseObject_viewModel.model.toJSON(), options)
+                }
+            }
+        },
+        batch: true,
+        serverPaging: true,
+        pageSize: 10,
+        schema: {
+            data: 'rows',
+            total: 'total',
+            model: {
+                id: "reviseId",
+                fields: {},
+                editable:function (col) {
+                    if(col=="number"||col=="name"||col=="type"||col=="version"||col=="state"||col=="modifyer"){
+                        return false;
+                    }else {
+                        return true;
+                    }
+                }
+            }
+        }
+    });
+
+    //产生对象表格
+    $("#reviseObject-Grid").kendoGrid({
+        excel:{
+            allPages:true,
+            fileName: "产生对象.xlsx"
+        },
+        dataSource: reviseObject_dataSource,
+        height: 300,
+        resizable: true,
+        scrollable: true,
+        navigatable: false,
+        selectable: 'multiple, rowbox',
+        pageable: {
+            pageSizes: [5, 10, 20, 50],
+            refresh: true,
+            buttonCount: 5
+        },
+        columns: [
+            {
+                field: "number",
+                title: '编号',
+                width: 120,
+                attributes: {style: "text-align:center"},
+                headerAttributes: {
+                    "class": "table-header-cell",
+                    style: "text-align: center"
+                }
+            },
+            {
+                field: "name",
+                title: '名称',
+                width: 120,
+                attributes: {style: "text-align:center"},
+                headerAttributes: {
+                    "class": "table-header-cell",
+                    style: "text-align: center"
+                }
+            },
+            {
+                field: "type",
+                title: '类型',
+                width: 120,
+                attributes: {style: "text-align:center"},
+                headerAttributes: {
+                    "class": "table-header-cell",
+                    style: "text-align: center"
+                }
+            },
+            {
+                field: "version",
+                title: '版本',
+                width: 120,
+                attributes: {style: "text-align:center"},
+                headerAttributes: {
+                    "class": "table-header-cell",
+                    style: "text-align: center"
+                }
+            },
+            {
+                field: "state",
+                title: '状态',
+                width: 120,
+                attributes: {style: "text-align:center"},
+                headerAttributes: {
+                    "class": "table-header-cell",
+                    style: "text-align: center"
+                }
+            },
+            {
+                field: "modifyer",
+                title: '修改者',
+                width: 120,
+                attributes: {style: "text-align:center"},
+            },
+            {
+                field: "description",
+                title: '备注信息',
+                width: 120,
+                attributes: {style: "text-align:center"},
+                headerAttributes: {
+                    "class": "table-header-cell",
+                    style: "text-align: center;color:#f00;"
+                }
+            }
+        ],
+        editable: true
+    });
+
+    //导入excel窗口初始化
+    window.excelWindow_revise= function(){
+        var excelWindow = $("#excelWindow_revise").kendoWindow({
+            title: '产生对象的导入',
+            content:"${base.contextPath}/bom/change/import_excel_revise.html?chginfoId="+chginfoId,
+            actions: [
+                "Pin",
+                "Close"
+            ],
+            modal:true,
+            visible:false,
+            iframe:true,
+            close: function() {
+                //window 关闭  刷新 本页面的  Grid
+                $('#reviseObject-Grid').data('kendoGrid').dataSource.page(1);
+            }
+        }).data("kendoWindow");
+        excelWindow.center().open();
+        //最大化
+        excelWindow.toggleMaximization();
+    }
+
+    //导出excel
+    $("#reviseObject-excel-out-btn").click(function(e) {
+        e.preventDefault();
+        var grid = $("#reviseObject-Grid").data("kendoGrid");
+        grid.saveAsExcel();
+    });
+
+    //导入excel
+    $("#reviseObject-excel-in-btn").click(function(e) {
+        e.preventDefault();
+        excelWindow_revise();
+    });
+
+    //产生对象收缩展开
+    $("#reviseObject").on("click",".bar-btn",function (e) {
+        e.preventDefault();
+        var classStr = $(this).find("span").attr("class")=='fa fa-angle-double-up'?'fa fa-angle-double-down':'fa fa-angle-double-up';
+        $(this).find("span").removeClass().addClass(classStr);
+        $("#reviseObject").find(".panel").toggle(0);
+    });
+
+
+    /**
+     * 模块四:被删除物料处理意见
+     */
+    //被删除物料处理意见数据源
+    var deleteObject_dataSource = new kendo.data.DataSource({
+            transport: {
+                read: {
+                    url: BaseUrl + "/bom/delete/part/query?chginfoId="+chginfoId,
+                    type: "POST",
+                    dataType: "json"
+                },
+                update: {
+                    url: BaseUrl + "/bom/delete/part/submit",
+                    type: "POST",
+                    contentType: "application/json"
+                },
+                destroy: {
+                    url: BaseUrl + "/bom/delete/part/remove",
+                    type: "POST",
+                    contentType: "application/json"
+                },
+                create: {
+                    url: BaseUrl + "/bom/delete/part/submit",
+                    type: "POST",
+                    contentType: "application/json"
+                },
+                parameterMap: function (options, type) {
+                    if (type !== "read" && options.models) {
+                        var datas = Hap.prepareSubmitParameter(options, type);
+                        return kendo.stringify(datas);
+                    } else if (type === "read") {
+                        return Hap.prepareQueryParameter(deleteObject_viewModel.model.toJSON(), options)
+                    }
+                }
+            },
+            batch: true,
+            serverPaging: true,
+            pageSize: 10,
+            schema: {
+                data: 'rows',
+                total: 'total',
+                model: {
+                    id: "deletePartId",
+                    fields: {},
+                    editable:function (col) {
+                        if(col=="number"||col=="name"||col=="pnumber"||col=="pname"){
+                            return false;
+                        }else {
+                            return true;
+                        }
+                    }
+                }
+            }
+        });
+
+    //被删除物料处理意见表格
+    $("#deleteObject-Grid").kendoGrid({
+        dataSource: deleteObject_dataSource,
+        height: 300,
+        autoBind: false,
+        resizable: true,
+        scrollable: true,
+        navigatable: false,
+        selectable: 'multiple, rowbox',
+        pageable: {
+            pageSizes: [5, 10, 20, 50],
+            refresh: true,
+            buttonCount: 5
+        },
+        columns: [
+            {
+                field: "number",
+                title: '被删除物料编号',
+                width: 120,
+                attributes: {style: "text-align:center"},
+                headerAttributes: {
+                    "class": "table-header-cell",
+                    style: "text-align: center"
+                }
+            },
+            {
+                field: "name",
+                title: '被删除物料名称',
+                width: 120,
+                attributes: {style: "text-align:center"},
+                headerAttributes: {
+                    "class": "table-header-cell",
+                    style: "text-align: center"
+                }
+            },
+            {
+                field: "pnumber",
+                title: '父项编号',
+                width: 120,
+                attributes: {style: "text-align:center"},
+                headerAttributes: {
+                    "class": "table-header-cell",
+                    style: "text-align: center"
+                }
+            },
+            {
+                field: "pname",
+                title: '父项名称',
+                width: 120,
+                attributes: {style: "text-align:center"},
+                headerAttributes: {
+                    "class": "table-header-cell",
+                    style: "text-align: center"
+                }
+            },
+            {
+                field: "solution",
+                title: '被删除物料处理意见',
+                width: 120,
+                attributes: {style: "text-align:center"},
+                headerAttributes: {
+                    "class": "table-header-cell",
+                    style: "text-align: center;color:#f00;"
+                },
+                editor: function (container, options) {
+                    $('<input name="' + options.field + '"/>')
+                        .appendTo(container)
+                        .kendoDropDownList({
+                            filter: "contains",
+                            valuePrimitive: true,
+                            dataTextField : "value",
+                            dataValueField : "value",
+                            dataSource : selectDataSource
+                        });
+                }
+            },
+            {
+                field: "description",
+                title: '备注信息',
+                width: 120,
+                attributes: {style: "text-align:center"},
+                headerAttributes: {
+                    "class": "table-header-cell",
+                    style: "text-align: center;color:#f00;"
+                }
+            }
+        ],
+        editable: true
+    });
+
+    //被删除物料处理意见收缩展开
+    $("#deleteObject").on("click",".bar-btn",function (e) {
+        e.preventDefault();
+        var classStr = $(this).find("span").attr("class")=='fa fa-angle-double-up'?'fa fa-angle-double-down':'fa fa-angle-double-up';
+        $(this).find("span").removeClass().addClass(classStr);
+        $("#deleteObject").find(".panel").toggle(0);
+    });
+
+    /**
+     * 确认按钮
+     */
+    //点击确认按钮
+    $("#confirm-btn").on("click",function(e){
+
+        /**
+         * {chginfo:{name:变更任务名称,processor:工作负责人oid,inworksol:在制品处理意见,stocksol:库存处理意见,
+         * testsol:试验大纲处理意见,softwaresol:软件处理意见},
+         * before:[{oid:受影响对象唯一标识,chgdescription:变更描述,inworksol:在制品处理意见,,
+         * stocksol:库存处理意见,testsol:试验大纲处理意见,softwaresol:软件处理意见,
+         * isdeletema:是否删除物料,description:备注}],
+         * after:[{oid:产生对象唯一标识,description:备注信息}],
+         * delobjinfo:[{oid:被删除物料唯一标识,pnumber:父项编号,pname:父项名称,solution:被删除物料处理意见,
+         * description:备注信息}]}
+         */
+        var param1="{chginfo:{name:变"+chginfo_viewModel.model.name+",processor:'"+chginfo_viewModel.model.processor+"',inworksol:"+chginfo_viewModel.model.inworksol+",stocksol:"+chginfo_viewModel.model.stocksol+",testsol:"+chginfo_viewModel.model.testsol+",softwaresol:"+chginfo_viewModel.model.softwaresol+"},";
+        var selection1=$('#effectObject-Grid').data('kendoGrid').dataSource._data;
+        var param2="before:[";
+        for (var y = 0; y < selection1.length; y++) {
+            if (y == selection1.length - 1) {
+                param2 += "{oid:'" + selection1[y].oid + "',chgdescription:" + selection1[y].chgdescription + ",inworksol:" + selection1[y].inworksol + ",stocksol:" + selection1[y].stocksol + ",testsol:" + selection1[y].testsol + ",softwaresol:" + selection1[y].softwaresol + ",isdeletema:" + selection1[y].isdeletema + ",description:" + selection1[y].description + "}";
+            } else {
+                param2 += "{oid:'" + selection1[y].oid + "',chgdescription:" + selection1[y].chgdescription + ",inworksol:" + selection1[y].inworksol + ",stocksol:" + selection1[y].stocksol + ",testsol:" + selection1[y].testsol + ",softwaresol:" + selection1[y].softwaresol + ",isdeletema:" + selection1[y].isdeletema + ",description:" + selection1[y].description + "},";
+
+            }
+        }
+            param2+="],"
+        var selection2=$('#reviseObject-Grid').data('kendoGrid').dataSource._data;
+        var param3="after:[";
+        for (var y = 0; y < selection2.length; y++) {
+            if (y == selection2.length - 1) {
+                param3 += "{oid:'"+selection2[y].oid+"',description:"+selection2[y].description+"}";
+            } else {
+                param3 += "{oid:'"+selection2[y].oid+"',description:"+selection2[y].description+"},";
+            }
+        }
+        param3+="],"
+        var selection3=$('#deleteObject-Grid').data('kendoGrid').dataSource._data;
+        var param4="delobjinfo:[";
+        for (var y = 0; y < selection3.length; y++) {
+            if (y == selection3.length - 1) {
+                param4 += "{oid:'"+selection3[y].oid+"',pnumber:"+selection3[y].pnumber+",pname:"+selection3[y].pname+",solution:"+selection3[y].solution+",description:"+selection3[y].description+"}";
+            } else {
+                param4 += "{oid:'"+selection3[y].oid+"',pnumber:"+selection3[y].pnumber+",pname:"+selection3[y].pname+",solution:"+selection3[y].solution+",description:"+selection3[y].description+"},";
+            }
+        }
+        param4+="]}"
+        var param5=param1+param2+param3+param4;
+                $.ajax({
+                    url: BaseUrl + "/sync/submit?param="+encodeURI(param5),
+                    type: "POST",
+                    success: function (json) {
+                        if (json.success) {
+                            kendo.ui.showInfoDialog({
+                                message: json.message
+                            }).done(function () {
+                                $("#deleteObject-Grid .k-i-refresh").trigger("click");
+                            });
+                        } else {
+                            kendo.ui.showInfoDialog({
+                                message:json.message
+                            })
+                        }
+                    }
+                });
+        e.preventDefault();
+        kendo.ui.showInfoDialog({
+            message:"将表单内容提交至PLM处理中..."
+        });
+    });
+
+    /**
+     * 新建状态
+     */
+    if (chginfoId==0){
+        $("#effectObject,#reviseObject,#deleteObject").find(".panel").hide(0);
+        $("#tool-btn span").attr("disabled","disabled").unbind();
+        $("#basic-info span.btn-primary").attr("disabled","disabled").unbind();
+        $("#confirm-btn span.btn-primary").attr("disabled","disabled").unbind();
+        $("#effectObject,#reviseObject,#deleteObject").attr("disabled","disabled").unbind("click");
+    }
+</script>
+</body>
+</html>

@@ -1,5 +1,10 @@
 package hbi.core.bom.controllers;
 
+import com.google.gson.Gson;
+import hbi.core.parsesoap.ResultAfter;
+import hbi.core.parsesoap.ResultObjs;
+import hbi.core.parsesoap.SoapUtil;
+import org.apache.axis.encoding.XMLType;
 import org.springframework.stereotype.Controller;
 import com.hand.hap.system.controllers.BaseController;
 import com.hand.hap.core.IRequest;
@@ -20,13 +25,32 @@ import java.util.List;
     @Autowired
     private IWncPartService service;
 
-
+        /**
+         * 搜索WNC系统对象
+         * @param dto
+         * @param page
+         * @param pageSize
+         * @param request
+         * @return
+         */
     @RequestMapping(value = "/bom/wnc/part/query")
     @ResponseBody
-    public ResponseData query(WncPart dto, @RequestParam(defaultValue = DEFAULT_PAGE) int page,
+    public ResponseData query( WncPart dto,@RequestParam(defaultValue = DEFAULT_PAGE) int page,
         @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int pageSize, HttpServletRequest request) {
-        IRequest requestContext = createRequestContext(request);
-        return new ResponseData(service.select(requestContext,dto,page,pageSize));
+        /*IRequest requestContext = createRequestContext(request);
+        return new ResponseData(service.select(requestContext,dto,page,pageSize));*/
+        String[] result=(String[])new SoapUtil().request("getWNCPart","plmadmin","abc.1234", XMLType.XSD_STRING,"{number:"+dto.getNumber()+"}");
+        Gson gson=new Gson();
+        ResultObjs objs=gson.fromJson(result[0],ResultObjs.class);
+        ResponseData data=new ResponseData(objs.getObjs());
+        if(objs.getResult()==0)
+        {
+            data.setMessage("成功");
+        }else
+        {
+            data.setMessage("失败");
+        }
+        return data;
     }
 
     /**

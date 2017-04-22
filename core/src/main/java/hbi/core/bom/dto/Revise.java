@@ -5,71 +5,151 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import com.hand.hap.mybatis.annotation.ExtensionAttribute;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import com.hand.hap.system.dto.BaseDTO;
 @ExtensionAttribute(disable=true)
 @Table(name = "bom_revise")
 public class Revise extends BaseDTO {
-     @Id
-     @GeneratedValue
-      private Long reviseId;
+    @Id
+    @GeneratedValue
+    private Long reviseId;
 
-      private Long chginfoId;
+    private Long chginfoId;
 
-      private String oid;
+    private String oid;
 
-      private String soid;
+    private String soid;
 
-      private String result;
+    private String result;
 
-      private String description;
+    private String description;
 
+    private String number;
 
-     public void setReviseId(Long reviseId){
-         this.reviseId = reviseId;
-     }
+    private String name;
 
-     public Long getReviseId(){
-         return reviseId;
-     }
+    private String type;
 
-     public void setChginfoId(Long chginfoId){
-         this.chginfoId = chginfoId;
-     }
+    private String version;
 
-     public Long getChginfoId(){
-         return chginfoId;
-     }
+    private String state;
 
-     public void setOid(String oid){
-         this.oid = oid;
-     }
+    private String modifyer;
 
-     public String getOid(){
-         return oid;
-     }
+    private String isauthen;
 
-     public void setSoid(String soid){
-         this.soid = soid;
-     }
+    private String authenpart;
 
-     public String getSoid(){
-         return soid;
-     }
+    public void setReviseId(Long reviseId){
+        this.reviseId = reviseId;
+    }
 
-     public void setResult(String result){
-         this.result = result;
-     }
+    public Long getReviseId(){
+        return reviseId;
+    }
 
-     public String getResult(){
-         return result;
-     }
+    public void setChginfoId(Long chginfoId){
+        this.chginfoId = chginfoId;
+    }
 
-     public void setDescription(String description){
-         this.description = description;
-     }
+    public Long getChginfoId(){
+        return chginfoId;
+    }
 
-     public String getDescription(){
-         return description;
-     }
+    public void setOid(String oid){
+        this.oid = oid;
+    }
 
-     }
+    public String getOid(){
+        return oid;
+    }
+
+    public void setSoid(String soid){
+        this.soid = soid;
+    }
+
+    public String getSoid(){
+        return soid;
+    }
+
+    public void setResult(String result){
+        this.result = result;
+    }
+
+    public String getResult(){
+        return result;
+    }
+
+    public void setDescription(String description){
+        this.description = description;
+    }
+
+    public String getDescription(){
+        return description;
+    }
+
+    public String getNumber() {
+        return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public String getModifyer() {
+        return modifyer;
+    }
+
+    public void setModifyer(String modifyer) {
+        this.modifyer = modifyer;
+    }
+
+    public String getIsauthen() {
+        return isauthen;
+    }
+
+    public void setIsauthen(String isauthen) {
+        this.isauthen = isauthen;
+    }
+
+    public String getAuthenpart() {
+        return authenpart;
+    }
+
+    public void setAuthenpart(String authenpart) {
+        this.authenpart = authenpart;
+    }
+}

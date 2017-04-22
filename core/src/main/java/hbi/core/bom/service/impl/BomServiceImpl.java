@@ -9,5 +9,4 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class BomServiceImpl extends BaseServiceImpl<Bom> implements IBomService{
-
 }
