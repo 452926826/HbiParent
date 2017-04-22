@@ -1,34 +1,40 @@
 <#include "../include/header.html">
     <style>
-        .bg-bar{
+        .bg-bar {
             position: relative;
             background: #f9f9f9;
             height: 30px;
             line-height: 30px;
             border-bottom: 1px solid #ccc;
         }
-        .bar-left{
+
+        .bar-left {
             padding-left: 10px;
         }
-        .panel{
+
+        .panel {
             margin-bottom: 0;
         }
-        .panel>.row{
+
+        .panel > .row {
             margin: 10px auto;
         }
-        .bar-btn{
+
+        .bar-btn {
             position: absolute;
             text-align: center;
             right: 10px;
-            top:5px;
+            top: 5px;
             width: 20px;
             height: 20px;
             cursor: pointer;
         }
-        .bar-btn>span{
-            font-size:22px;
+
+        .bar-btn > span {
+            font-size: 22px;
         }
-        .col-xs-offset-1 .form-group{
+
+        .col-xs-offset-1 .form-group {
             margin: 5px 0;
         }
     </style>
@@ -38,14 +44,14 @@
             //新加子分类
             createFunction: function () {
                 var length = $("#Grid tbody input[type=checkbox]:checked").length;
-                if(length!=1){
+                if (length != 1) {
                     kendo.ui.showInfoDialog({
-                        message:"请选择一行"
+                        message: "请选择一行"
                     });
-                }else {
+                } else {
                     var uid = $("#Grid tbody input[type=checkbox]:checked").parents("tr").attr("data-uid");
                     var treeList = $("#Grid").data("kendoTreeList");
-                    var rowNew=treeList.addRow($('[data-uid='+uid+']'));
+                    var rowNew = treeList.addRow($('[data-uid=' + uid + ']'));
                 }
             },
             //保存
@@ -53,54 +59,54 @@
                 $('#Grid').data('kendoTreeList').saveRow();
             },
             //展开
-            expandFunction:function(e) {
+            expandFunction: function (e) {
                 e.preventDefault();
                 var treeList = $("#Grid").data("kendoTreeList");
-                for (var i = 0;i<$("#Grid tbody input[type=checkbox]:checked").length;i++){
+                for (var i = 0; i < $("#Grid tbody input[type=checkbox]:checked").length; i++) {
                     var uid = $("#Grid tbody input[type=checkbox]:checked").eq(i).parents("tr").attr("data-uid");
-                    var row = treeList.content.find("tr[data-uid=" + uid+ "]");
+                    var row = treeList.content.find("tr[data-uid=" + uid + "]");
                     treeList.expand(row)
                 }
             },
             //收缩
-            compressFunction:function (e) {
+            compressFunction: function (e) {
                 e.preventDefault();
                 var treeList = $("#Grid").data("kendoTreeList");
-                for (var i = 0;i<$("#Grid tbody input[type=checkbox]:checked").length;i++){
+                for (var i = 0; i < $("#Grid tbody input[type=checkbox]:checked").length; i++) {
                     var uid = $("#Grid tbody input[type=checkbox]:checked").eq(i).parents("tr").attr("data-uid");
-                    var row = treeList.content.find("tr[data-uid=" + uid+ "]");
+                    var row = treeList.content.find("tr[data-uid=" + uid + "]");
                     treeList.collapse(row);
                 }
             },
             //展开全部
-            expandAllFunction:function (e) {
+            expandAllFunction: function (e) {
                 e.preventDefault();
                 var treeList = $("#Grid").data("kendoTreeList"),
                     row = treeList.content.find("tr:visible").last();
                 treeList.expand(row)
             },
             //收缩全部
-            compressAllFunction:function (e) {
+            compressAllFunction: function (e) {
                 e.preventDefault();
                 var treeList = $("#Grid").data("kendoTreeList"),
                     row = treeList.content.find("tr:visible").first();
                 treeList.collapse(row)
             },
             //获取产品替换物料
-            getReplacePart:function (e) {
+            getReplacePart: function (e) {
                 e.preventDefault();
                 var length = $("#Grid tbody input[type=checkbox]:checked").length;
-                if(length!=1){
+                if (length != 1) {
                     kendo.ui.showInfoDialog({
-                        message:"请选择一行"
+                        message: "请选择一行"
                     });
-                }else {
+                } else {
                     var linkida2a2 = $("#Grid tbody input[type=checkbox]:checked").eq(0).attr("data-linkida2a2");
 
                     var replacePartDataSource = new kendo.data.DataSource({
                         transport: {
                             read: {
-                                url: "${base.contextPath}/bom/replace/part/query?ida2a2="+linkida2a2,
+                                url: "${base.contextPath}/bom/replace/part/query?ida2a2=" + linkida2a2,
                                 type: "POST",
                                 dataType: "json"
                             },
@@ -118,8 +124,7 @@
                             total: 'total',
                             model: {
                                 id: 'partId',
-                                fields: {
-                                }
+                                fields: {}
                             }
                         }
                     });
@@ -178,20 +183,20 @@
                 }
             },
             //获取产品关联文
-            getReplaceDoc:function (e) {
+            getReplaceDoc: function (e) {
                 e.preventDefault();
                 var length = $("#Grid tbody input[type=checkbox]:checked").length;
-                if(length!=1){
+                if (length != 1) {
                     kendo.ui.showInfoDialog({
-                        message:"请选择一行"
+                        message: "请选择一行"
                     });
-                }else {
+                } else {
                     var id = $("#Grid tbody input[type=checkbox]:checked").eq(0).attr("data-id");
 
                     var replacePartDataSource = new kendo.data.DataSource({
                         transport: {
                             read: {
-                                url: "${base.contextPath}/bom/related/doc/query?ida2a2="+id,
+                                url: "${base.contextPath}/bom/related/doc/query?ida2a2=" + id,
                                 type: "POST",
                                 dataType: "json"
                             },
@@ -209,8 +214,7 @@
                             total: 'total',
                             model: {
                                 id: 'relatedDocId',
-                                fields: {
-                                }
+                                fields: {}
                             }
                         }
                     });
@@ -332,14 +336,12 @@
 
         //获取产品替换物料viewModel
         var replacePart_viewModel = kendo.observable({
-            model: {
-            }
+            model: {}
         });
 
         //获取产品关联文viewModel
         var replaceDoc_viewModel = kendo.observable({
-            model: {
-            }
+            model: {}
         });
     </script>
     <body>
@@ -359,55 +361,64 @@
             <div class="form-group">
                 <label class="col-xs-2 control-label">名称</label>
                 <div class="col-xs-3">
-                    <input id="name" type="text"  style='border-left:0px;border-top:0px;border-right:0px;' readonly="true" >
+                    <input id="name" type="text" style='border-left:0px;border-top:0px;border-right:0px;'
+                           readonly="true">
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-xs-2 control-label">状态</label>
                 <div class="col-xs-3">
-                    <input id="status" type="text"  style='border-left:0px;border-top:0px;border-right:0px; ' readonly="true" >
+                    <input id="status" type="text" style='border-left:0px;border-top:0px;border-right:0px; '
+                           readonly="true">
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-xs-2 control-label">状况</label>
                 <div class="col-xs-3">
-                    <input id="state" type="text"  style='border-left:0px;border-top:0px;border-right:0px; ' readonly="true" >
+                    <input id="state" type="text" style='border-left:0px;border-top:0px;border-right:0px; '
+                           readonly="true">
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-xs-2 control-label">修改者</label>
                 <div class="col-xs-3">
-                    <input id="modifyer" type="text"  style='border-left:0px;border-top:0px;border-right:0px; ' readonly="true" >
+                    <input id="modifyer" type="text" style='border-left:0px;border-top:0px;border-right:0px; '
+                           readonly="true">
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-xs-2 control-label">位置</label>
                 <div class="col-xs-3">
-                    <input id="location" type="text"  style='border-left:0px;border-top:0px;border-right:0px; ' readonly="true" >
+                    <input id="location" type="text" style='border-left:0px;border-top:0px;border-right:0px; '
+                           readonly="true">
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-xs-2 control-label">成品</label>
                 <div class="col-xs-3">
-                    <input id="is" type="text"  style='border-left:0px;border-top:0px;border-right:0px;' readonly="true"  value="是">
+                    <input id="is" type="text" style='border-left:0px;border-top:0px;border-right:0px;' readonly="true"
+                           value="是">
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-xs-2 control-label">默认跟踪代码</label>
                 <div class="col-xs-3">
-                    <input id="value1" type="text"  style='border-left:0px;border-top:0px;border-right:0px;' readonly="true" value="序列号">
+                    <input id="value1" type="text" style='border-left:0px;border-top:0px;border-right:0px;'
+                           readonly="true" value="序列号">
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-xs-2 control-label">产品生命周期状态</label>
                 <div class="col-xs-3">
-                    <input id="value2" type="text"  style='border-left:0px;border-top:0px;border-right:0px; ' readonly="true" >
+                    <input id="value2" type="text" style='border-left:0px;border-top:0px;border-right:0px; '
+                           readonly="true">
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-xs-2 control-label">是否认证产品</label>
                 <div class="col-xs-3">
-                    <input id="value3" type="text"  style='border-left:0px;border-top:0px;border-right:0px;' readonly="true" >
+                    <input id="value3" type="text" style='border-left:0px;border-top:0px;border-right:0px;'
+                           readonly="true">
                 </div>
             </div>
             <div class="form-group">
@@ -422,7 +433,8 @@
         <div class="pull-left" id="toolbar-btn" style="padding-bottom:10px;">
         <span class="btn btn-primary k-grid-add" style="float:left;margin-right:5px;" data-bind="click:createFunction">
             <i class="fa fa-plus-square" style="margin-right:3px;"></i>新建子分类</span>
-            <span class="btn btn-success k-grid-save-changes" data-bind="click:saveFunction" style="float:left;margin-right:5px;">
+            <span class="btn btn-success k-grid-save-changes" data-bind="click:saveFunction"
+                  style="float:left;margin-right:5px;">
             <i class="fa fa-save" style="margin-right:3px;"></i><@spring.message "hap.save"/></span>
             <span class="btn btn-primary" data-bind="click:expandFunction" style="float:left;margin-right:5px;">
             <i class="fa fa-expand" style="margin-right:3px;"></i>展开</span>
@@ -438,7 +450,7 @@
             <span class="btn btn-info" data-bind="click:getReplaceDoc" style="float:left;margin-right:5px;">
             <i class="fa fa-hand-o-up" style="margin-right:3px;"></i>获取产品关联文</span>
         </div>
-        <div  style="clear:both">
+        <div style="clear:both">
             <div id="Grid" style="margin-bottom: 30px;"></div>
         </div>
         <div id="dialog"></div>
@@ -458,7 +470,6 @@
             <div id="replaceDoc-Grid"></div>
         </div>
     </div>
-
 
 
     <script type="text/javascript">
@@ -493,20 +504,20 @@
         }
 
 
-        var ida2a2='${RequestParameters.ida2a2}';
-        var name='${RequestParameters.name}';
-        var state='${RequestParameters.state}';
-        var status='${RequestParameters.status}';
-        var modifyer='${RequestParameters.modifyer}';
-        var number='${RequestParameters.number}';
-        var version='${RequestParameters.version}';
-        var modtime='${RequestParameters.modtime}';
-        var view='${RequestParameters.view}';
+        var ida2a2 = '${RequestParameters.ida2a2}';
+        var name = '${RequestParameters.name}';
+        var state = '${RequestParameters.state}';
+        var status = '${RequestParameters.status}';
+        var modifyer = '${RequestParameters.modifyer}';
+        var number = '${RequestParameters.number}';
+        var version = '${RequestParameters.version}';
+        var modtime = '${RequestParameters.modtime}';
+        var view = '${RequestParameters.view}';
         $("#name").val(name);
         $("#state").val(state);
         $("#status").val(status);
-        $("#modifyer").val(modifyer +"于"+ modtime+" 修改");
-        document.getElementById("title").innerText="产品-"+ida2a2+","+version+","+number;
+        $("#modifyer").val(modifyer + "于" + modtime + " 修改");
+        document.getElementById("title").innerText = "产品-" + ida2a2 + "," + version + "," + number;
         kendo.bind($('#page-content'), viewModel);
         var BaseUrl = _basePath;
         var selectedDataItems = [];
@@ -518,7 +529,8 @@
             var dataSource = new kendo.data.TreeListDataSource({
                 transport: {
                     read: {
-                        url: BaseUrl + "/bom/bom/test?idida2a2="+ida2a2+"&version="+version+"&number="+number+"&name="+name+"&view="+view,
+                        url: BaseUrl + "/bom/bom/queryAllMysql?idida2a2=" + ida2a2 + "&version=" + version + "&number=" + number + "&name=" + name + "&view=" + view,
+                        //url: BaseUrl + "/bom/bom/test?idida2a2="+ida2a2+"&version="+version+"&number="+number+"&name="+name+"&view="+view,
                         type: "POST",
                         dataType: "json"
                     },
@@ -552,9 +564,9 @@
                         parentId: "parentid",
                         expanded: true,
                         fields: {
-                            bomId: { type: "number", editable: false, nullable: false },
-                            parentid: { nullable: true, type: "number" },
-                            childnum: { validation: { required: true } },
+                            bomId: {type: "number", editable: false, nullable: false},
+                            parentid: {nullable: true, type: "number"},
+                            childnum: {validation: {required: true}},
                         },
                     }
                 }
@@ -563,14 +575,14 @@
             var tree = $("#Grid").kendoTreeList({
                 dataSource: dataSource,
                 columnMenu: true,
-                reorderable:true,
+                reorderable: true,
                 resizable: true,
                 scrollable: true,
                 navigatable: false,
-                editable:true,
-                selectable:'row',
-                height:"100%",
-                change: function(e) {
+                editable: true,
+                selectable: 'row',
+                height: "100%",
+                change: function (e) {
                     var selectedRows = this.select();
                     for (var i = 0; i < selectedRows.length; i++) {
                         var dataItem = this.dataItem(selectedRows[i]);
@@ -584,19 +596,19 @@
                 },
                 columns: [
                     {
-                        headerTemplate:'<input type="checkbox" id="check-all"/>',
-                        locked:true,
-                        template: function(dataItem){
-                            if(dataItem.childnum==null||dataItem.childnum==""){
+                        headerTemplate: '<input type="checkbox" id="check-all"/>',
+                        locked: true,
+                        template: function (dataItem) {
+                            if (dataItem.childnum == null || dataItem.childnum == "") {
                                 return "";
-                            }else {
-                                return "<input data-linkida2a2="+
-                                    dataItem.linkida2a2+" data-id="+
-                                    dataItem.id+" type='checkbox' name='check'   />";
+                            } else {
+                                return "<input data-linkida2a2=" +
+                                    dataItem.linkida2a2 + " data-id=" +
+                                    dataItem.id + " type='checkbox' name='check'   />";
                             }
                         },
                         width: 60,
-                        headerAttributes:{
+                        headerAttributes: {
                             style: "text-align: center;"
                         },
                         attributes: {
@@ -612,17 +624,17 @@
                     },
                     {
                         title: '层级',
-                        width: 85 ,
+                        width: 85,
                         attributes: {style: "text-align:center"},
                         headerAttributes: {
-                            style  : "text-align: center"
+                            style: "text-align: center"
                         },
-                        template: function(dataItem){
+                        template: function (dataItem) {
                             var level = dataSource.level(dataItem);
-                            if (level==0){
+                            if (level == 0) {
                                 return 'ROOT';
-                            }else {
-                                return 'LEVEL '+level;
+                            } else {
+                                return 'LEVEL ' + level;
                             }
                         }
                     },
@@ -727,19 +739,19 @@
                         edit: "编辑",
                         update: "保存",
                         canceledit: "取消",
-                        destroy:"删除"
+                        destroy: "删除"
                     }
                 }
             }).data("kendoTreeList");
 
             //全选
-            $("#check-all").click(function(e){
-                $("#Grid tbody input[type=checkbox]").prop("checked",$(this).is(":checked"))
+            $("#check-all").click(function (e) {
+                $("#Grid tbody input[type=checkbox]").prop("checked", $(this).is(":checked"))
             });
             //产生对象收缩展开
-            $("#base_info_form").on("click",".bar-btn",function (e) {
+            $("#base_info_form").on("click", ".bar-btn", function (e) {
                 e.preventDefault();
-                var classStr = $(this).find("span").attr("class")=='fa fa-angle-double-up'?'fa fa-angle-double-down':'fa fa-angle-double-up';
+                var classStr = $(this).find("span").attr("class") == 'fa fa-angle-double-up' ? 'fa fa-angle-double-down' : 'fa fa-angle-double-up';
                 $(this).find("span").removeClass().addClass(classStr);
                 $("#base_info_form").find(".col-xs-offset-1").toggle(0);
             });
@@ -776,20 +788,9 @@
         });
 
 
-
-
-
-
-
-
-
-
-
-
         /*grid = $("#Grid").data("kendoTreeList");
          grid.table.on("click", ".checkbox", selectRow);*/
-        function changeParent(id)
-        {
+        function changeParent(id) {
             var dialog = $("#dialog").kendoWindow({
                 actions: ["Close"],
 //            animation: {
@@ -808,8 +809,7 @@
                 visible: false,
                 iframe: true,
                 modal: true,
-                close:function()
-                {
+                close: function () {
                     $('#Grid').data('kendoTreeList').dataSource.page(1);
                 },
                 content: 'employees_parent.html?id=' + id

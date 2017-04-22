@@ -32,6 +32,7 @@ public class BomController extends BaseController {
     @Autowired
     private IOBomService oservice;
     private List<Bom> bomList = new ArrayList<>();
+    private List<Bom> bomMysqlList = new ArrayList<>();
 
 
     @RequestMapping(value = "/bom/bom/query")
@@ -45,7 +46,7 @@ public class BomController extends BaseController {
         String view = request.getParameter("view");
         //2227773156
         //id="2227773156";
-        List<Bom> list = getBom(id);
+        List<Bom> list = getBomSoap(id);
         Bom b = new Bom();
         b.setId(id);
         b.setChildnum(number);
@@ -86,20 +87,19 @@ public class BomController extends BaseController {
         b.setId(idida2a2);
         List<BomSync> list = new ArrayList<>();
         if (id != null) {
-            list = getBomListSync(id);
-            for (BomSync bom:list
-                 ) {
-                if(Integer.parseInt(bom.getTotal())>0)
-                {
+            //如果id不为空,则获取当前层级的
+            list = getBomSoapListSync(id);
+            for (BomSync bom : list
+                    ) {
+                if (Integer.parseInt(bom.getTotal()) > 0) {
                     bom.setHasChildren(true);
                 }
             }
-        } else {
-            list = getBomListSync(idida2a2);
-            for (BomSync bom:list
+        } else {//如果id为空，则获取当前层级+根节点
+            list = getBomSoapListSync(idida2a2);
+            for (BomSync bom : list
                     ) {
-                if(Integer.parseInt(bom.getTotal())>0)
-                {
+                if (Integer.parseInt(bom.getTotal()) > 0) {
                     bom.setHasChildren(true);
                 }
             }
@@ -156,13 +156,14 @@ public class BomController extends BaseController {
         return new ResponseData();
     }
 
-    public List<Bom> getBom(String id) {
+    public List<Bom> getBomSoap(String id) {
         bomList = new ArrayList<>();
-        getBomList(id);
+        getBomSoapList(id);
         return bomList;
     }
 
-    public void getBomList(String id) {
+    //通过SOAP方式，递归获取BOM所有层级的数据
+    public void getBomSoapList(String id) {
         String[] result = (String[]) new SoapUtil().request("getBom", "plmadmin", "abc.1234", XMLType.XSD_STRING, "{id:" + id + "}");
         if (result[0].contains("result\":0")) {
             Gson gson = new Gson();
@@ -171,23 +172,25 @@ public class BomController extends BaseController {
             for (Bom b : bom.getBom()
                     ) {
                 if (Integer.parseInt(b.getTotal()) > 0) {
-                    getBomList(b.getId());
+                    getBomSoapList(b.getId());
                 }
             }
         }
     }
 
-    public List<BomSync> getBomListSync(String id) {
+    //通过Soap方式，获取当前层级的BOM
+    public List<BomSync> getBomSoapListSync(String id) {
         List<BomSync> boms = new ArrayList<>();
         String[] result = (String[]) new SoapUtil().request("getBom", "plmadmin", "abc.1234", XMLType.XSD_STRING, "{id:" + id + "}");
         if (result[0].contains("result\":0")) {
             Gson gson = new Gson();
             ResultBomSync bom = gson.fromJson(result[0], ResultBomSync.class);
-            boms=bom.getBom();
+            boms = bom.getBom();
         }
         return boms;
     }
 
+    //异步直连数据库获取当前层级bom
     @RequestMapping(value = "/bom/bom/sync")
     @ResponseBody
     public ResponseData getsync(HttpServletRequest request, @RequestParam(required = false) String id,
@@ -223,6 +226,7 @@ public class BomController extends BaseController {
         return new ResponseData(list);
     }
 
+    //直连获取所有层级BOM数据
     @RequestMapping(value = "/bom/bom/test")
     @ResponseBody
     public ResponseData get(HttpServletRequest request) {
@@ -238,12 +242,50 @@ public class BomController extends BaseController {
         b.setVersion(version);
         List<Bom> list = new ArrayList<>();
         if ("设计" == view || "设计".equals(view)) {
-
             list = oservice.getBomsT(id);
         } else {
             list = oservice.getBoms(id);
         }
         list.add(b);
         return new ResponseData(list);
+    }
+
+
+    @RequestMapping(value = "/bom/bom/queryAllMysql")
+    @ResponseBody
+    public ResponseData queryAllMysql(Bom dto, @RequestParam(defaultValue = DEFAULT_PAGE) int page,
+                              @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int pageSize, HttpServletRequest request) {
+        String id = request.getParameter("idida2a2");
+        String number = request.getParameter("number");
+        String version = request.getParameter("version");
+        String name = request.getParameter("name");
+        String view = request.getParameter("view");
+        List<Bom> list = getBomMysql(id);
+        Bom b = new Bom();
+        b.setId(id);
+        b.setChildnum(number);
+        b.setChildname(name);
+        b.setVersion(version);
+        b.setView(view);
+        list.add(b);
+        ResponseData data = new ResponseData(list);
+        return data;
+    }
+
+    public List<Bom> getBomMysql(String id) {
+        bomMysqlList = new ArrayList<>();
+        getBomMysqlList(id);
+        return bomMysqlList;
+    }
+
+    //直连mysql数据库，递归获取BOM所有层级的数据
+    public void getBomMysqlList(String id) {
+        bomMysqlList.addAll(oservice.getBomsMysql(id));
+        for (Bom b : oservice.getBomsMysql(id)
+                ) {
+            if (Integer.parseInt(b.getTotal()) > 0) {
+                getBomMysqlList(b.getId());
+            }
+        }
     }
 }

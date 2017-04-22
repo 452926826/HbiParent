@@ -11,6 +11,7 @@ import java.util.List;
 public interface IOBomService {
     List<Bom> getBoms(String id);
     List<Bom> getBomsT(String id);
+    List<Bom> getBomsMysql(String id);
     List<BomSync> getBomsSync(String id);
     List<BomSync> getBomsTSync(String id);
 }

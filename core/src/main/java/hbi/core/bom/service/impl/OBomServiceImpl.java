@@ -26,6 +26,11 @@ private OBomMapper mapper;
     }
 
     @Override
+    public List<Bom> getBomsMysql(String id) {
+        return mapper.getBomsMysql(id);
+    }
+
+    @Override
     public List<BomSync> getBomsSync(String id) {
         return mapper.getBomsSync(id);
     }
