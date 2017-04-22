@@ -129,6 +129,7 @@ kendo.bind($('#page-content'), viewModel);
                     {
                 field: "ida2a2",
                 title: '<@spring.message "PartBasicAtt.ida2a2"/>',
+                        locked:true,
                 width: 120
             },
                     {
@@ -209,6 +210,7 @@ function showTree2(ida2a2,name,state,status,modifyer,number,version,modtime,view
 }
     function showTree3(ida2a2,name,state,status,modifyer,number,version,modtime,view)
     {
+<<<<<<< HEAD
         parent.openTab('GET_BOMs3','获取BOMS(接口)', '${base.contextPath}/bom/soapsync.html?ida2a2='+ida2a2+'&name='+name+
             '&state='+state+'&status='+status+'&modifyer='+modifyer+
             '&number='+number+"&version="+version+"&modtime="+modtime+"&view="+view);
@@ -224,6 +226,10 @@ function showTree2(ida2a2,name,state,status,modifyer,number,version,modtime,view
     {
         $('#Grid').data('kendoGrid').dataSource.page(1);
         var title = number+'-详细信息';
+=======
+        $('#Grid').data('kendoGrid').dataSource.page(1);
+        var title = item.ida2a2+'-详细信息';
+>>>>>>> 26fa36e3af60d28ed1ab50b49f1cc39adabca933
         var dialog = $("#detaildialog")
             .kendoWindow(
                 {
@@ -233,9 +239,15 @@ function showTree2(ida2a2,name,state,status,modifyer,number,version,modtime,view
                     modal: true,
                     visible: false,
                     iframe: true,
+<<<<<<< HEAD
                     content: 'employees.html?ida2a2='+ida2a2+'&name='+name+
                         '&state='+state+'&status='+status+'&modifyer='+modifyer+
                         '&number='+number+"&version="+version+"&modtime="+modtime
+=======
+                    content: 'employees.html?ida2a2='+item.ida2a2+'&name='+item.name+
+                        '&state='+item.state+'&status='+item.status+'&modifyer='+item.modifyer+
+                        '&number='+item.number+"&version="+item.version+"&modtime="+item.modtime
+>>>>>>> 26fa36e3af60d28ed1ab50b49f1cc39adabca933
                 }).data("kendoWindow").title(title);
         dialog.maximize().open();
     }*/

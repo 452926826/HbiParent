@@ -48,7 +48,11 @@
         var objectDataSource = new kendo.data.DataSource({
             transport: {
                 read: {
+<<<<<<< HEAD
                     url: "${base.contextPath}/bom/wnc/part/query",
+=======
+                    url: "${base.contextPath}/bom/wnc/part/queryBasic",
+>>>>>>> 26fa36e3af60d28ed1ab50b49f1cc39adabca933
                     type: "POST",
                     dataType: "json"
                 },
@@ -223,7 +227,10 @@
                             }
                         }
                     });
+<<<<<<< HEAD
 
+=======
+>>>>>>> 26fa36e3af60d28ed1ab50b49f1cc39adabca933
                 }
             }else if(addObjectStr=="reviseObject-add-btn") {
                 //添加受影响对象
@@ -245,8 +252,13 @@
                     for (var y = 0; y < selection.length; y++) {
                         dataObj_reviseObject.push({
                             "__status": "add",
+<<<<<<< HEAD
                             chginfoId: chginfoId,
                             oid: selection[y].oid,
+=======
+                            chginfoId:chginfoId,
+                            oid:selection[y].oid,
+>>>>>>> 26fa36e3af60d28ed1ab50b49f1cc39adabca933
                             number:selection[y].number,
                             name:selection[y].name,
                             type:selection[y].type,

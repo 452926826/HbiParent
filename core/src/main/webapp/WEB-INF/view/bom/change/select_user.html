@@ -49,7 +49,11 @@
         var userDataSource = new kendo.data.DataSource({
             transport: {
                 read: {
+<<<<<<< HEAD
                     url: "${base.contextPath}/bom/wnc/user/query",
+=======
+                    url: "${base.contextPath}/bom/wnc/user/queryBasic",
+>>>>>>> 26fa36e3af60d28ed1ab50b49f1cc39adabca933
                     type: "POST",
                     dataType: "json"
                 },
@@ -138,7 +142,11 @@
                 message:"请选择一条数据"
             });
         }else {
+<<<<<<< HEAD
             chginfo_viewModel.model.set("processor",selection[0].name);
+=======
+            chginfo_viewModel.model.set("processor",selection[0].oid);
+>>>>>>> 26fa36e3af60d28ed1ab50b49f1cc39adabca933
             chginfo_viewModel.model.set("number",selection[0].number);
             chginfo_viewModel.model.set("userOid",selection[0].oid);
             chginfo_viewModel.model.set("username",selection[0].name);

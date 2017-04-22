@@ -37,6 +37,7 @@
         e.preventDefault();
         var grid = $("#effectObject-Grid").data("kendoGrid");
         var checked = grid.selectedDataItems();
+<<<<<<< HEAD
        /* if(checked.length!=1){
             kendo.ui.showInfoDialog({
                 message: "请选择一行"
@@ -58,6 +59,17 @@
                     read: {
                         url: "${base.contextPath}/bom/key/part/query?param="+encodeURI(param),/*+checked[0].oid+"&number="
                         +checked[0].number+"&version="+checked[0].version,*/
+=======
+        if(checked.length!=1){
+            kendo.ui.showInfoDialog({
+                message: "请选择一行"
+            })
+        }else {
+            var authenpartDataSource = new kendo.data.DataSource({
+                transport: {
+                    read: {
+                        url: "${base.contextPath}/bom/key/part/query?oid="+checked[0].oid,
+>>>>>>> 26fa36e3af60d28ed1ab50b49f1cc39adabca933
                         type: "POST",
                         dataType: "json"
                     },
@@ -152,7 +164,11 @@
             var win = $("#authenpart-dialog").data("kendoWindow");
             win.modal = true;
             win.center().open();
+<<<<<<< HEAD
 
+=======
+        }
+>>>>>>> 26fa36e3af60d28ed1ab50b49f1cc39adabca933
 
     });
 </script>

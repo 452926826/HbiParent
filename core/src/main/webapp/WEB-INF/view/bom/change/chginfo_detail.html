@@ -50,7 +50,11 @@
         line-height: 1.5 !important;
     }
 </style>
+<<<<<<< HEAD
 <script src="${base.contextPath}/lib/jszip.min.js"></script>
+=======
+<script src="http://kendo.cdn.telerik.com/2017.1.118/js/jszip.min.js"></script>
+>>>>>>> 26fa36e3af60d28ed1ab50b49f1cc39adabca933
 <script>
     //获取查询页面传递过来的chginfoId
     //0->新建状态 !0更新状态
@@ -233,6 +237,7 @@
         },
         //查询方法
         queryResource: function (e) {
+<<<<<<< HEAD
 
             var selection = $('#reviseObject-Grid').data('kendoGrid').selectedDataItems();
             if(selection.length<1) {
@@ -272,6 +277,8 @@
                     }
                 }
             });
+=======
+>>>>>>> 26fa36e3af60d28ed1ab50b49f1cc39adabca933
             e.preventDefault();
             $('#deleteObject-Grid').data('kendoGrid').dataSource.page(1);
         },
@@ -385,6 +392,7 @@
     <div class="panel">
         <div class="clearfix" style="margin: 5px;">
             <!--新建修订版本-->
+<<<<<<< HEAD
             <span style="float:left;margin-right:3px;" class="btn btn-info"
                   id="revise-btn"><i class="fa fa-plus-square"
                                                      style="margin-right:3px;"></i>新建修订版本</span>
@@ -417,6 +425,40 @@
             <!--变更对象下层关键件信息查询-->
             <span style="float:left;margin-right:3px;" class="btn btn-warning"
                   id="show-detail-btn"><i class="fa fa-calendar-minus-o" style="margin-right:3px;"></i>关键件信息查询</span>
+=======
+            <span style="float:left;margin-right:5px;" class="btn btn-info"
+                  id="revise-btn"><i class="fa fa-plus-square"
+                                                     style="margin-right:3px;"></i>新建修订版本</span>
+            <!--导出受影响的对象-->
+            <span style="float:left;margin-right:5px;" class="btn btn-default"
+                  id="effectObject-excel-out-btn"><i class="fa fa-file-excel-o"
+                                               style="margin-right:3px;"></i>导出受影响的对象</span>
+            <!--导入受影响的对象-->
+            <span style="float:left;margin-right:5px;" class="btn btn-default"
+                  id="effectObject-excel-in-btn"><i class="fa fa-file-excel-o"
+                                                     style="margin-right:3px;"></i>导入受影响的对象</span>
+            <!--添加-->
+            <span style="float:left;margin-right:5px;" class="btn btn-primary"
+                id="effectObject-add-btn"><i class="fa fa-plus-square"
+                                       style="margin-right:3px;"></i>添加</span>
+            <!--保存-->
+            <span style="float:left;margin-right:5px;" class="btn btn-success"
+                  data-bind="click:saveFunction">
+            <i class="fa fa-save" style="margin-right:3px;"></i>保存</span>
+            <!--删除-->
+            <span style="float:left;margin-right:5px;" class="btn btn-danger"
+                  data-bind="click:deleteFunction"><i
+            class="fa fa-trash-o" style="margin-right:3px;"></i><@spring.message "hap.delete"/></span>
+            <!--复制-->
+            <span style="float:left;margin-right:5px;" class="btn btn-primary"
+                  id="effectObject-copy-btn"><i class="fa fa-copy" style="margin-right:3px;"></i>复制</span>
+            <!--粘贴-->
+            <span style="float:left;margin-right:5px;" class="btn btn-primary"
+                  id="effectObject-paste-btn"><i class="fa fa-clipboard" style="margin-right:3px;"></i>粘贴</span>
+            <!--变更对象下层关键件信息查询-->
+            <span style="float:left;margin-right:5px;" class="btn btn-warning"
+                  id="show-detail-btn"><i class="fa fa-calendar-minus-o" style="margin-right:3px;"></i>变更对象下层关键件信息查询</span>
+>>>>>>> 26fa36e3af60d28ed1ab50b49f1cc39adabca933
         </div>
         <div id="effectObject-Grid">
 
@@ -635,6 +677,7 @@
         },
         columns: [
             {
+<<<<<<< HEAD
                 field: "oid",
                 title: 'oid',
                 width: 150,
@@ -645,6 +688,8 @@
                 }
             },
             {
+=======
+>>>>>>> 26fa36e3af60d28ed1ab50b49f1cc39adabca933
                 field: "number",
                 title: '编号',
                 width: 120,
@@ -860,7 +905,10 @@
                 message:"请选择一条数据"
             });
         }else {
+<<<<<<< HEAD
             copyObj.chgdescription = selection[0].chgdescription;
+=======
+>>>>>>> 26fa36e3af60d28ed1ab50b49f1cc39adabca933
             copyObj.isdeletema = selection[0].isdeletema;
             copyObj.inworksol = selection[0].inworksol;
             copyObj.stocksol = selection[0].stocksol;
@@ -887,7 +935,10 @@
             })
         }else {
             for (var i = 0;i<checked.length;i++){
+<<<<<<< HEAD
                 checked[i].chgdescription=copyObj.chgdescription;
+=======
+>>>>>>> 26fa36e3af60d28ed1ab50b49f1cc39adabca933
                 checked[i].isdeletema=copyObj.inworksol;
                 checked[i].inworksol=copyObj.inworksol;
                 checked[i].stocksol=copyObj.stocksol;
@@ -940,7 +991,11 @@
     });
 
     //新建修订版本
+<<<<<<< HEAD
     $("#revise-btn").click(function (e) {
+=======
+    $("#revise-btn").click(function (e)     {
+>>>>>>> 26fa36e3af60d28ed1ab50b49f1cc39adabca933
         e.preventDefault();
         var selection = $('#effectObject-Grid').data('kendoGrid').selectedDataItems();
         if(selection.length==0){
@@ -973,15 +1028,23 @@
                     dataObj_reviseObject.push({
                         "__status": "add",
                         chginfoId: chginfoId,
+<<<<<<< HEAD
                         oid: selection[y].oid,
                         number:selection[y].number,
                         name:selection[y].name,
                         type:selection[y].type
+=======
+                        oid: selection[y].oid
+>>>>>>> 26fa36e3af60d28ed1ab50b49f1cc39adabca933
                     });
                 }
                 //插入到产生对象
                 $.ajax({
+<<<<<<< HEAD
                     url: BaseUrl + "/bom/revise/submitUpdate",
+=======
+                    url: BaseUrl + "/bom/revise/submit",
+>>>>>>> 26fa36e3af60d28ed1ab50b49f1cc39adabca933
                     type: "POST",
                     contentType: "application/json",
                     dataType: "json",
@@ -989,13 +1052,21 @@
                     success: function (json) {
                         if (json.success) {
                             kendo.ui.showInfoDialog({
+<<<<<<< HEAD
                                 message: json.message
+=======
+                                message: "添加成功"
+>>>>>>> 26fa36e3af60d28ed1ab50b49f1cc39adabca933
                             }).done(function () {
                                 $("#reviseObject-Grid .k-i-refresh").trigger("click");
                             });
                         } else {
                             kendo.ui.showInfoDialog({
+<<<<<<< HEAD
                                 message:  json.message
+=======
+                                message: "添加失败"
+>>>>>>> 26fa36e3af60d28ed1ab50b49f1cc39adabca933
                             })
                         }
                     }
@@ -1349,6 +1420,7 @@
      */
     //点击确认按钮
     $("#confirm-btn").on("click",function(e){
+<<<<<<< HEAD
 
         /**
          * {chginfo:{name:变更任务名称,processor:工作负责人oid,inworksol:在制品处理意见,stocksol:库存处理意见,
@@ -1410,6 +1482,8 @@
                         }
                     }
                 });
+=======
+>>>>>>> 26fa36e3af60d28ed1ab50b49f1cc39adabca933
         e.preventDefault();
         kendo.ui.showInfoDialog({
             message:"将表单内容提交至PLM处理中..."
