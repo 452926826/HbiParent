@@ -246,4 +246,17 @@ public class BomController extends BaseController {
         list.add(b);
         return new ResponseData(list);
     }
+
+
+
+
+
+    @RequestMapping(value = "/bom/bom/queryAll")
+    @ResponseBody
+    public ResponseData queryAll(Bom dto, @RequestParam(defaultValue = DEFAULT_PAGE) int page,
+                              @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int pageSize,  HttpServletRequest request) {
+        IRequest requestCtx = createRequestContext(request);
+        return new ResponseData(service.select(requestCtx,dto,page,pageSize));
+    }
+
 }
