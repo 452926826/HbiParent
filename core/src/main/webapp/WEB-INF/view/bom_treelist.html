@@ -76,7 +76,12 @@
     $.ajax({
         /*url:"${base.contextPath}/bom/bom/queryAll?pagesize=10000",
         url:"${base.contextPath}/bom/bom/queryAllMysql?idida2a2=2225730112&version=B.9&number=TE003-337600&name=TE003-337600&view=设计",*/
+/*
         url:"${base.contextPath}/bom/bom/queryAllMysqlSync?idida2a2=2225730112&version=B.9&number=TE003-337600&name=TE003-337600&view=设计",
+*/
+     /*   url:"${base.contextPath}/bom/bom/test?idida2a2=348448618&version=A.B.1&number=6102H04-0000000&name=6102H04-0000000&view=制造",
+        url:"${base.contextPath}/bom/bom/test?idida2a2=2225730112&version=B.9&number=TE003-337600&name=TE003-337600&view=设计",
+       */ url:"${base.contextPath}/bom/bom/test?idida2a2=210638092&version=A.B.2&number=TE151-000000&name=TE151-000000&view=制造",
         async:false,
         success:function (data) {
             dataJson = data.rows;
