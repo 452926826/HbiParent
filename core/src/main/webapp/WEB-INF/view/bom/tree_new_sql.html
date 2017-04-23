@@ -500,7 +500,7 @@
             /*url:"${base.contextPath}/bom/bom/queryAll?pagesize=10000",
              url:"${base.contextPath}/bom/bom/queryAllMysql?idida2a2=2225730112&version=B.9&number=TE003-337600&name=TE003-337600&view=设计",
             url:"${base.contextPath}/bom/bom/queryAllMysqlSync?idida2a2=2225730112&version=B.9&number=TE003-337600&name=TE003-337600&view=设计",*/
-            url:"${base.contextPath}/bom/bom/test?idida2a2=348448618&version=A.B.2&number=TE151-000000 &name=TE151-000000 0&view=制造",
+            url:"${base.contextPath}/bom/bom/test?idida2a2="+ida2a2+"&version="+version+"&number="+number+"&name="+name+"&view="+view,
             async:false,
             success:function (data) {
                 dataJson = data.rows;
@@ -686,13 +686,13 @@
             });
 
 
-            $(window).scroll(function () {
+           /* $(window).scroll(function () {
                 if($(window).scrollTop()>410){
                     $("#toolbar-btn").addClass("fixed-bar");
                 }else if($(window).scrollTop()<=410){
                     $("#toolbar-btn").removeClass("fixed-bar");
                 }
-            });
+            });*/
 
 
         });
