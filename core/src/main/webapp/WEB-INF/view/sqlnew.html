@@ -58,17 +58,17 @@
     </style>
     <script type="text/javascript">
         var viewModel = kendo.observable({
-            model: {}
-            /*//获取产品替换物料
+            model: {},
+            //获取产品替换物料
             getReplacePart: function (e) {
                 e.preventDefault();
-                var length = $("#Grid tbody input[type=checkbox]:checked").length;
+                var length =$("#treeGrid").jqxTreeGrid('getCheckedRows').length;
                 if (length != 1) {
                     kendo.ui.showInfoDialog({
                         message: "请选择一行"
                     });
                 } else {
-                    var linkida2a2 = $("#Grid tbody input[type=checkbox]:checked").eq(0).attr("data-linkida2a2");
+                    var linkida2a2 = $("#treeGrid").jqxTreeGrid('getCheckedRows')[0].childnum;
 
                     var replacePartDataSource = new kendo.data.DataSource({
                         transport: {
@@ -152,13 +152,13 @@
             //获取产品关联文
             getReplaceDoc: function (e) {
                 e.preventDefault();
-                var length = $("#Grid tbody input[type=checkbox]:checked").length;
+                var length =$("#treeGrid").jqxTreeGrid('getCheckedRows').length;
                 if (length != 1) {
                     kendo.ui.showInfoDialog({
                         message: "请选择一行"
                     });
                 } else {
-                    var id = $("#Grid tbody input[type=checkbox]:checked").eq(0).attr("data-id");
+                    var id =  $("#treeGrid").jqxTreeGrid('getCheckedRows')[0].id;
 
                     var replacePartDataSource = new kendo.data.DataSource({
                         transport: {
@@ -308,7 +308,7 @@
 
         //获取产品关联文viewModel
         var replaceDoc_viewModel = kendo.observable({
-            model: {}*/
+            model: {}
         });
     </script>
     <body>
