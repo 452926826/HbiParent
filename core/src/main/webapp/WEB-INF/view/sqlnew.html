@@ -68,7 +68,7 @@
                         message: "请选择一行"
                     });
                 } else {
-                    var linkida2a2 = $("#treeGrid").jqxTreeGrid('getCheckedRows')[0].childnum;
+                    var linkida2a2 = $("#treeGrid").jqxTreeGrid('getCheckedRows')[0].linkida2a2;
 
                     var replacePartDataSource = new kendo.data.DataSource({
                         transport: {
@@ -476,13 +476,18 @@
                         { name: 'total', type: 'number' },
                         { name: 'linenum', type: 'number' },
                         { name: 'amount', type: 'number' },
+                        { name: 'occurrence', type: 'string' },
                         { name: 'childnum', type: 'string' },
+                        { name: 'specification', type: 'string' },
+                        { name: 'linkida2a2', type: 'string' },
                         { name: 'childname', type: 'string' },
                         { name: 'partstate', type: 'string' },
                         { name: 'status', type: 'string' },
                         { name: 'version', type: 'string' },
                         { name: 'view', type: 'string' },
                         { name: 'cadtype', type: 'string' },
+                        { name: 'drawingsize', type: 'string' },
+                        { name: 'drawingtype', type: 'string' },
                         { name: 'hasChildren', type: 'boolean' }
                     ],
                     hierarchy:
@@ -515,13 +520,17 @@
                         { text: '子件编号',dataField: 'childnum', minWidth: 100, width: 200 ,pinned: true},
                         { text: '子件名称', dataField: 'childname', minWidth: 100, width: 200 ,pinned: false},
                         { text: '状态', dataField: 'state', minWidth: 100, width: 120,pinned: false },
+                        { text: '型号规格', dataField: 'specification', minWidth: 100, width: 120,pinned: false },
                         { text: '总数', dataField: 'total', minWidth: 100, width: 120 ,pinned: false},
                         { text: '行号', dataField: 'linenum', minWidth: 100, width: 120 ,pinned: false},
+                        { text: '位号', dataField: 'occurrence', minWidth: 100, width: 120 ,pinned: false},
                         { text: '数量', dataField: 'amount', minWidth: 100, width: 120 ,pinned: false},
                         { text: '状态2', dataField: 'partstate', minWidth: 100, width: 120,pinned: false },
                         { text: '状况', dataField: 'status', minWidth: 100, width: 120 ,pinned: false},
                         { text: '版本', dataField: 'version', minWidth: 100, width: 120 ,pinned: false},
                         { text: '视图', dataField: 'view', minWidth: 100, width: 120 ,pinned: false},
+                        { text: '图幅', dataField: 'drawingsize', minWidth: 100, width: 120 ,pinned: false},
+                        {text: '图样类型', dataField: 'drawingtype', minWidth: 100, width: 120 ,pinned: false},
                         { text: '图纸类型', dataField: 'cadtype', minWidth: 100, width: 120 ,pinned: false}
                     ]
                 });
@@ -531,28 +540,34 @@
         var listSource = [
             {label: '子件编号', value: 'childnum', checked: true },
             {label: '子件名称', value: 'childname', checked: true },
+            {label: '型号规格', value: 'specification', checked: true },
             { label: '状态', value: 'state', checked: true },
             { label: '总数', value: 'total', checked: true },
             {label: '行号', value: 'linenum', checked: true },
+            {label: '位号', value: 'occurrence', checked: true },
             {label: '数量', value: 'amount', checked: true },
             {label: '状态2', value: 'partstate', checked: true },
             {label: '状况', value: 'status', checked: true },
             {label: '版本', value: 'version', checked: true },
             {label: '视图', value: 'view', checked: true },
+            {label: '图幅', value: 'drawingsize', checked: true},
             {label: '图纸类型', value: 'cadtype', checked: true},
         ];
 
         var listSource2 = [
             {label: '子件编号', value: 'childnum', checked: true },
             {label: '子件名称', value: 'childname', checked: false },
+            {label: '型号规格', value: 'specification', checked: true },
             { label: '状态', value: 'state', checked: false },
             { label: '总数', value: 'total', checked: false },
             {label: '行号', value: 'linenum', checked: false },
+            {label: '位号', value: 'occurrence', checked: false },
             {label: '数量', value: 'amount', checked: false },
             {label: '状态2', value: 'partstate', checked: false },
             {label: '状况', value: 'status', checked: false },
             {label: '版本', value: 'version', checked: false },
             {label: '视图', value: 'view', checked: false },
+            {label: '图幅', value: 'drawingsize', checked: false},
             {label: '图纸类型', value: 'cadtype', checked: false},
         ];
 
