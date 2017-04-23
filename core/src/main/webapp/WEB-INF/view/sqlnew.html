@@ -55,6 +55,40 @@
         #treeGrid span[id] {
             display: none !important;
         }
+
+        #page-content{
+            position: relative;
+            margin-top: 10px;
+        }
+        #toolbar-btn{
+            z-index: 1000;
+            width: 100%;
+            top:0;
+            background: #fff;
+            margin-bottom: 10px;
+        }
+
+
+        #page-content span.btn{
+            border-radius: 6px;
+        }
+        #left-toolbar{
+           /* position: fixed;*/
+            /*left:20px;*/
+        }
+        #treeGrid{
+            margin-top: 10px;
+        }
+
+        #jqxlistbox,#jqxlistbox2{
+            z-index: 1000;
+            position: absolute;
+            top:30px;
+            left:0;
+            /*background: none; 透明*/
+            background: #eee;
+            display: none;
+        }
     </style>
     <script type="text/javascript">
         var viewModel = kendo.observable({
@@ -398,26 +432,28 @@
     </form>
     <div id="page-content">
         <div class="pull-left" id="toolbar-btn">
-        <span id="expandOne" class="btn btn-primary" data-bind="click:expandFunction" style="float:left;margin-right:5px;">
+        <span id="expandOne" class="btn btn-primary" style="float:left;margin-right:5px;">
             <i class="fa fa-expand" style="margin-right:3px;"></i>展开</span>
-            <span id="collapseOne" class="btn btn-warning" data-bind="click:compressFunction" style="float:left;margin-right:5px;">
+            <span id="collapseOne" class="btn btn-warning"  style="float:left;margin-right:5px;">
             <i class="fa fa-compress" style="margin-right:3px;"></i>收缩</span>
-            <span id="expandAll" class="btn btn-primary" data-bind="click:expandAllFunction" style="float:left;margin-right:5px;">
+            <span id="expandAll" class="btn btn-primary"  style="float:left;margin-right:5px;">
             <i class="fa fa-expand" style="margin-right:3px;"></i>展开全部</span>
-            <span id="collapseAll" class="btn btn-warning" data-bind="click:compressAllFunction" style="float:left;margin-right:5px;">
+            <span id="collapseAll" class="btn btn-warning" style="float:left;margin-right:5px;">
             <i class="fa fa-compress" style="margin-right:3px;"></i>收缩全部</span>
             <span class="btn btn-info" data-bind="click:getReplacePart" style="float:left;margin-right:5px;">
             <i class="fa fa-hand-o-up" style="margin-right:3px;"></i>获取产品替换物料</span>
             <span class="btn btn-info" data-bind="click:getReplaceDoc" style="float:left;margin-right:5px;">
             <i class="fa fa-hand-o-up" style="margin-right:3px;"></i>获取产品关联文</span>
-        </div>
-        <div id="left-toolbar">
-            <span style="width: 120px;text-align: center;display: inline-block;font-size: 14px;margin-bottom: 2px;">显示/隐藏列</span>
-            <div id="jqxlistbox">
-            </div>
-            <span style="width: 120px;text-align: center;display: inline-block;font-size: 14px;margin-bottom: 2px;margin-top: 5px;">锁定/解锁列</span>
-            <div id="jqxlistbox2">
-            </div>
+            <span id="jqxlistbox-btn" class="btn btn-success" style="float:left;margin-right:5px;position: relative;">
+            <span id="jqxlistbox">
+            </span>
+            <i class="fa fa-check-square-o" style="margin-right:3px;"></i>显示/隐藏列
+            </span>
+            <span id="jqxlistbox-btn2" class="btn btn-success" style="float:left;margin-right:5px;position: relative;">
+            <span id="jqxlistbox2">
+            </span>
+            <i class="fa fa-check-square-o" style="margin-right:3px;"></i>锁定/解锁列
+            </span>
         </div>
         <div id="treeGrid"></div>
     </div>
@@ -502,20 +538,17 @@
             // create Tree Grid
             $("#treeGrid").jqxTreeGrid(
                 {
-                    width: 800,
+                    width: 1000,
                     source: dataAdapter,
                     sortable: true,
                     theme: 'bootstrap',
                     hierarchicalCheckboxes: true,
                     altRows: true,
                     checkboxes:true,
+                    columnsReorder: true,
+                    enableHover: false,
                     columnsResize:true,
                     filterable: true,
-                    ready: function()
-                    {
-                        // expand row with 根节点id
-                        $("#treeGrid").jqxTreeGrid('expandRow', 32);
-                    },
                     columns: [
                         { text: '子件编号',dataField: 'childnum', minWidth: 100, width: 200 ,pinned: true},
                         { text: '子件名称', dataField: 'childname', minWidth: 100, width: 200 ,pinned: false},
@@ -534,111 +567,124 @@
                         { text: '图纸类型', dataField: 'cadtype', minWidth: 100, width: 120 ,pinned: false}
                     ]
                 });
-        });
+
+            var listSource = [
+                {label: '子件编号', value: 'childnum', checked: true },
+                {label: '子件名称', value: 'childname', checked: true },
+                {label: '型号规格', value: 'specification', checked: true },
+                { label: '状态', value: 'state', checked: true },
+                { label: '总数', value: 'total', checked: true },
+                {label: '行号', value: 'linenum', checked: true },
+                {label: '位号', value: 'occurrence', checked: true },
+                {label: '数量', value: 'amount', checked: true },
+                {label: '状态2', value: 'partstate', checked: true },
+                {label: '状况', value: 'status', checked: true },
+                {label: '版本', value: 'version', checked: true },
+                {label: '视图', value: 'view', checked: true },
+                {label: '图幅', value: 'drawingsize', checked: true},
+                {label: '图纸类型', value: 'cadtype', checked: true},
+            ];
+
+            var listSource2 = [
+                {label: '子件编号', value: 'childnum', checked: true },
+                {label: '子件名称', value: 'childname', checked: false },
+                {label: '型号规格', value: 'specification', checked: true },
+                { label: '状态', value: 'state', checked: false },
+                { label: '总数', value: 'total', checked: false },
+                {label: '行号', value: 'linenum', checked: false },
+                {label: '位号', value: 'occurrence', checked: false },
+                {label: '数量', value: 'amount', checked: false },
+                {label: '状态2', value: 'partstate', checked: false },
+                {label: '状况', value: 'status', checked: false },
+                {label: '版本', value: 'version', checked: false },
+                {label: '视图', value: 'view', checked: false },
+                {label: '图幅', value: 'drawingsize', checked: false},
+                {label: '图纸类型', value: 'cadtype', checked: false},
+            ];
 
 
-        var listSource = [
-            {label: '子件编号', value: 'childnum', checked: true },
-            {label: '子件名称', value: 'childname', checked: true },
-            {label: '型号规格', value: 'specification', checked: true },
-            { label: '状态', value: 'state', checked: true },
-            { label: '总数', value: 'total', checked: true },
-            {label: '行号', value: 'linenum', checked: true },
-            {label: '位号', value: 'occurrence', checked: true },
-            {label: '数量', value: 'amount', checked: true },
-            {label: '状态2', value: 'partstate', checked: true },
-            {label: '状况', value: 'status', checked: true },
-            {label: '版本', value: 'version', checked: true },
-            {label: '视图', value: 'view', checked: true },
-            {label: '图幅', value: 'drawingsize', checked: true},
-            {label: '图纸类型', value: 'cadtype', checked: true},
-        ];
-
-        var listSource2 = [
-            {label: '子件编号', value: 'childnum', checked: true },
-            {label: '子件名称', value: 'childname', checked: false },
-            {label: '型号规格', value: 'specification', checked: true },
-            { label: '状态', value: 'state', checked: false },
-            { label: '总数', value: 'total', checked: false },
-            {label: '行号', value: 'linenum', checked: false },
-            {label: '位号', value: 'occurrence', checked: false },
-            {label: '数量', value: 'amount', checked: false },
-            {label: '状态2', value: 'partstate', checked: false },
-            {label: '状况', value: 'status', checked: false },
-            {label: '版本', value: 'version', checked: false },
-            {label: '视图', value: 'view', checked: false },
-            {label: '图幅', value: 'drawingsize', checked: false},
-            {label: '图纸类型', value: 'cadtype', checked: false},
-        ];
-
-
-        $("#jqxlistbox").jqxListBox({source: listSource, width: 120, height: 200,  checkboxes: true });
-        $("#jqxlistbox").on('checkChange', function (event) {
-            NProgress.start();
-            $("#treeGrid").jqxTreeGrid('beginUpdate');
-            if (event.args.checked) {
-                $("#treeGrid").jqxTreeGrid('showColumn', event.args.value);
-            }
-            else {
-                $("#treeGrid").jqxTreeGrid('hideColumn', event.args.value);
-            }
-            $("#treeGrid").jqxTreeGrid('endUpdate');
-            NProgress.done();
-        });
-
-        $("#jqxlistbox2").jqxListBox({source: listSource2, width: 120, height: 200,  checkboxes: true });
-        $("#jqxlistbox2").on('checkChange', function (event) {
-            NProgress.start();
-            $("#treeGrid").jqxTreeGrid('beginUpdate');
-            $("#treeGrid").jqxTreeGrid('setColumnProperty', event.args.value, 'pinned', event.args.checked);
-            $("#treeGrid").jqxTreeGrid('endUpdate');
-            NProgress.done();
-        });
-        //产生对象收缩展开
-        $("#base_info_form").on("click", ".bar-btn", function (e) {
-            e.preventDefault();
-            var classStr = $(this).find("span").attr("class") == 'fa fa-angle-double-up' ? 'fa fa-angle-double-down' : 'fa fa-angle-double-up';
-            $(this).find("span").removeClass().addClass(classStr);
-            $("#base_info_form").find(".col-xs-offset-1").toggle(0);
-        });
-
-
-        $("#collapseAll").click(function () {
-            NProgress.start();
-            $("#treeGrid").jqxTreeGrid('collapseAll');
-            NProgress.done();
-        });
-
-
-        $("#expandAll").click(function () {
-            NProgress.start();
-            $("#treeGrid").jqxTreeGrid('expandAll');
-            NProgress.done();
-        });
-
-        $("#expandOne").click(function () {
-            NProgress.start();
-            var selection = $("#treeGrid").jqxTreeGrid('getCheckedRows');
-            for (var i = 0; i < selection.length; i++) {
-                if(selection[i].hasChildren){
-                    $("#treeGrid").jqxTreeGrid('expandRow',selection[i].id);
+            $("#jqxlistbox").jqxListBox({source: listSource, width: 120, height: 200,  checkboxes: true });
+            $("#jqxlistbox").on('checkChange', function (event) {
+                NProgress.start();
+                $("#treeGrid").jqxTreeGrid('beginUpdate');
+                if (event.args.checked) {
+                    $("#treeGrid").jqxTreeGrid('showColumn', event.args.value);
                 }
-            }
-            NProgress.done();
-        });
-
-        $("#collapseOne").click(function () {
-            NProgress.start();
-            var selection = $("#treeGrid").jqxTreeGrid('getCheckedRows');
-            for (var i = 0; i < selection.length; i++) {
-                if(selection[i].hasChildren){
-                    $("#treeGrid").jqxTreeGrid('collapseRow',selection[i].id);
+                else {
+                    $("#treeGrid").jqxTreeGrid('hideColumn', event.args.value);
                 }
-            }
-            NProgress.done();
+                $("#treeGrid").jqxTreeGrid('endUpdate');
+                NProgress.done();
+            });
+
+            $("#jqxlistbox2").jqxListBox({source: listSource2, width: 120, height: 200,  checkboxes: true });
+            $("#jqxlistbox2").on('checkChange', function (event) {
+                NProgress.start();
+                $("#treeGrid").jqxTreeGrid('beginUpdate');
+                $("#treeGrid").jqxTreeGrid('setColumnProperty', event.args.value, 'pinned', event.args.checked);
+                $("#treeGrid").jqxTreeGrid('endUpdate');
+                NProgress.done();
+            });
+            //产生对象收缩展开
+            $("#base_info_form").on("click", ".bar-btn", function (e) {
+                e.preventDefault();
+                var classStr = $(this).find("span").attr("class") == 'fa fa-angle-double-up' ? 'fa fa-angle-double-down' : 'fa fa-angle-double-up';
+                $(this).find("span").removeClass().addClass(classStr);
+                $("#base_info_form").find(".col-xs-offset-1").toggle(0);
+            });
+
+
+            $("#collapseAll").click(function () {
+                NProgress.start();
+                $("#treeGrid").jqxTreeGrid('collapseAll');
+                NProgress.done();
+            });
+
+
+            $("#expandAll").click(function () {
+                NProgress.start();
+                $("#treeGrid").jqxTreeGrid('expandAll');
+                NProgress.done();
+            });
+
+            $("#expandOne").click(function () {
+                NProgress.start();
+                var selection = $("#treeGrid").jqxTreeGrid('getCheckedRows');
+                for (var i = 0; i < selection.length; i++) {
+                    if(selection[i].hasChildren){
+                        $("#treeGrid").jqxTreeGrid('expandRow',selection[i].id);
+                    }
+                }
+                NProgress.done();
+            });
+
+            $("#collapseOne").click(function () {
+                NProgress.start();
+                var selection = $("#treeGrid").jqxTreeGrid('getCheckedRows');
+                for (var i = 0; i < selection.length; i++) {
+                    if(selection[i].hasChildren){
+                        $("#treeGrid").jqxTreeGrid('collapseRow',selection[i].id);
+                    }
+                }
+                NProgress.done();
+            });
+
+            $('#treeGrid').on('bindingComplete', function (event) { NProgress.done(); });
+
+            $("#jqxlistbox-btn").click(function () {
+               $("#jqxlistbox").toggle();
+            });
+
+            $("#jqxlistbox-btn2").click(function () {
+                $("#jqxlistbox2").toggle();
+            });
+
+
+
         });
 
-        $('#treeGrid').on('bindingComplete', function (event) { NProgress.done(); });
+
+
 
     </script>
     </body>
