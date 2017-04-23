@@ -89,7 +89,7 @@
             {
                 width: 800,
                 source: dataAdapter,
-                /*hierarchicalCheckboxes: true,*/
+                hierarchicalCheckboxes: true,
                 altRows: true,
                 checkboxes:true,
                 filterable: true,
@@ -186,6 +186,13 @@
        var selection = $("#treeGrid").jqxTreeGrid('getCheckedRows');
        for (var i = 0; i < selection.length; i++) {
            $("#treeGrid").jqxTreeGrid('expandRow',selection[i].id);
+
+           /*if(selection[i].hasChildren){
+               $("#treeGrid").jqxTreeGrid('expandRow',selection[i].id);
+           }*/
+
+
+
        }
     });
 
@@ -193,6 +200,10 @@
         var selection = $("#treeGrid").jqxTreeGrid('getCheckedRows');
         for (var i = 0; i < selection.length; i++) {
             $("#treeGrid").jqxTreeGrid('collapseRow',selection[i].id);
+
+            /*if(selection[i].hasChildren){
+             $("#treeGrid").jqxTreeGrid('expandRow',selection[i].id);
+             }*/
         }
     });
 
