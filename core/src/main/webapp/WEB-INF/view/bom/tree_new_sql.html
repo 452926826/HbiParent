@@ -89,6 +89,11 @@
             background: #eee;
             display: none;
         }
+        .fixed-bar{
+            position: fixed;
+            background: #fff;
+            padding: 5px;
+        }
     </style>
     <script type="text/javascript">
         var viewModel = kendo.observable({
@@ -493,8 +498,8 @@
         var dataJson = null;
         $.ajax({
             /*url:"${base.contextPath}/bom/bom/queryAll?pagesize=10000",
-             url:"${base.contextPath}/bom/bom/queryAllMysql?idida2a2=2225730112&version=B.9&number=TE003-337600&name=TE003-337600&view=设计",*/
-            //url:"${base.contextPath}/bom/bom/queryAllMysqlSync?idida2a2=2225730112&version=B.9&number=TE003-337600&name=TE003-337600&view=设计",
+             url:"${base.contextPath}/bom/bom/queryAllMysql?idida2a2=2225730112&version=B.9&number=TE003-337600&name=TE003-337600&view=设计",
+            url:"${base.contextPath}/bom/bom/queryAllMysqlSync?idida2a2=2225730112&version=B.9&number=TE003-337600&name=TE003-337600&view=设计",*/
             url:"${base.contextPath}/bom/bom/test?idida2a2=348448618&version=A.B.2&number=TE151-000000 &name=TE151-000000 0&view=制造",
             async:false,
             success:function (data) {
@@ -570,7 +575,7 @@
                 });
 
             var listSource = [
-                {label: '子件编号', value: 'childnum', checked: true },
+                /*{label: '子件编号', value: 'childnum', checked: true },*/
                 {label: '子件名称', value: 'childname', checked: true },
                 {label: '型号规格', value: 'specification', checked: true },
                 { label: '状态', value: 'state', checked: true },
@@ -587,9 +592,9 @@
             ];
 
             var listSource2 = [
-                {label: '子件编号', value: 'childnum', checked: true },
+               /* {label: '子件编号', value: 'childnum', checked: true },*/
                 {label: '子件名称', value: 'childname', checked: false },
-                {label: '型号规格', value: 'specification', checked: true },
+                {label: '型号规格', value: 'specification', checked: false },
                 { label: '状态', value: 'state', checked: false },
                 { label: '总数', value: 'total', checked: false },
                 {label: '行号', value: 'linenum', checked: false },
@@ -680,6 +685,14 @@
                 $("#jqxlistbox2").toggle();
             });
 
+
+            $(window).scroll(function () {
+                if($(window).scrollTop()>410){
+                    $("#toolbar-btn").addClass("fixed-bar");
+                }else if($(window).scrollTop()<=410){
+                    $("#toolbar-btn").removeClass("fixed-bar");
+                }
+            });
 
 
         });
