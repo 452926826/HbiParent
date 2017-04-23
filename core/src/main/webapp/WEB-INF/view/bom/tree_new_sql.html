@@ -654,14 +654,22 @@
             });
 
             $("#expandOne").click(function () {
-                NProgress.start();
+
                 var selection = $("#treeGrid").jqxTreeGrid('getCheckedRows');
-                for (var i = 0; i < selection.length; i++) {
-                    if(selection[i].total>0){
-                        $("#treeGrid").jqxTreeGrid('expandRow',selection[i].id);
+                if(selection[0].id==ida2a2)
+                {
+                    NProgress.start();
+                    $("#treeGrid").jqxTreeGrid('expandAll');
+                    NProgress.done();
+                }else {
+                    NProgress.start();
+                    for (var i = 0; i < selection.length; i++) {
+                        if (selection[i].total > 0) {
+                            $("#treeGrid").jqxTreeGrid('expandRow', selection[i].id);
+                        }
                     }
+                    NProgress.done();
                 }
-                NProgress.done();
             });
 
             $("#collapseOne").click(function () {
