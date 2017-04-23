@@ -33,6 +33,7 @@ public class BomController extends BaseController {
     private IOBomService oservice;
     private List<Bom> bomList = new ArrayList<>();
     private List<Bom> bomMysqlList = new ArrayList<>();
+    private List<BomSync> bomMysqlListSync = new ArrayList<>();
 
 
     @RequestMapping(value = "/bom/bom/query")
@@ -292,6 +293,45 @@ public class BomController extends BaseController {
                 ) {
             if (Integer.parseInt(b.getTotal()) > 0) {
                 getBomMysqlList(b.getId());
+            }
+        }
+    }
+
+    @RequestMapping(value = "/bom/bom/queryAllMysqlSync")
+    @ResponseBody
+    public ResponseData queryAllMysqlSync(Bom dto, @RequestParam(defaultValue = DEFAULT_PAGE) int page,
+                                      @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) int pageSize, HttpServletRequest request) {
+        String id = request.getParameter("idida2a2");
+        String number = request.getParameter("number");
+        String version = request.getParameter("version");
+        String name = request.getParameter("name");
+        String view = request.getParameter("view");
+        List<BomSync> list = getBomMysqlSync(id);
+        BomSync b = new BomSync();
+        b.setId(id);
+        b.setChildnum(number);
+        b.setChildname(name);
+        b.setVersion(version);
+        b.setView(view);
+        b.setHasChildren(true);
+        list.add(b);
+        ResponseData data = new ResponseData(list);
+        return data;
+    }
+
+    public List<BomSync> getBomMysqlSync(String id) {
+        bomMysqlListSync = new ArrayList<>();
+        getBomMysqlListSync(id);
+        return bomMysqlListSync;
+    }
+
+    //直连mysql数据库，递归获取BOM所有层级的数据
+    public void getBomMysqlListSync(String id) {
+        bomMysqlListSync.addAll(oservice.getBomsMysqlSync(id));
+        for (BomSync b : oservice.getBomsMysqlSync(id)
+                ) {
+            if (Integer.parseInt(b.getTotal()) > 0) {
+                getBomMysqlListSync(b.getId());
             }
         }
     }

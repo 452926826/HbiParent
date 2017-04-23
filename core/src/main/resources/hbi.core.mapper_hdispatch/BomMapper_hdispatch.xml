@@ -100,6 +100,11 @@ connect by prior t.id = t.parentid
         from cux_bom_v t
         where t.parentid = #{0}
     </select>
+    <select id="getBomsMysqlSync" parameterType="java.lang.String" resultMap="BaseResultMapSync">
+        select t.*
+        from cux_bom_v t
+        where t.parentid = #{0}
+    </select>
     <select id="getBomsSync" parameterType="java.lang.String" resultMap="BaseResultMapSync">
         select t.*
         from cux_bom_v t

@@ -135,7 +135,7 @@
                 template: function (dataItem) {
                     var ids = JSON.stringify(dataItem);
                     var item = dataItem;
-                    return "<a href='javascript:void(0);' onclick=showTree3('" + item.ida2a2 + "','" + item.name + "','" + item.state + "','" + item.status + "','" + item.modifyer + "','" + item.number + "','" + item.version + "','" + item.modtime + "','" + item.view + "')>接口</a>" + "<a href='javascript:void(0);' onclick=showTree4('" + item.ida2a2 + "','" + item.name + "','" + item.state + "','" + item.status + "','" + item.modifyer + "','" + item.number + "','" + item.version + "','" + item.modtime + "','" + item.view + "')>  直连</a>";
+                    return "<a href='javascript:void(0);' onclick=showTree5('" + item.ida2a2 + "','" + item.name + "','" + item.state + "','" + item.status + "','" + item.modifyer + "','" + item.number + "','" + item.version + "','" + item.modtime + "','" + item.view + "')>接口</a>" + "<a href='javascript:void(0);' onclick=showTree6('" + item.ida2a2 + "','" + item.name + "','" + item.state + "','" + item.status + "','" + item.modifyer + "','" + item.number + "','" + item.version + "','" + item.modtime + "','" + item.view + "')>  直连</a>";
                 }
             },
                 {
@@ -225,6 +225,17 @@
         }
         function showTree4(ida2a2, name, state, status, modifyer, number, version, modtime, view) {
             parent.openTab('GET_BOMs4', '获取BOMS(直连)', '${base.contextPath}/bom/sqlsync.html?ida2a2=' + ida2a2 + '&name=' + name +
+                '&state=' + state + '&status=' + status + '&modifyer=' + modifyer +
+                '&number=' + number + "&version=" + version + "&modtime=" + modtime + "&view=" + view);
+        }
+        function showTree5(ida2a2, name, state, status, modifyer, number, version, modtime, view) {
+            parent.openTab('GET_BOMs5', 'BOM展示(接口)', '${base.contextPath}/bom/soapsync.html?ida2a2=' + ida2a2 + '&name=' + name +
+                '&state=' + state + '&status=' + status + '&modifyer=' + modifyer +
+                '&number=' + number + "&version=" + version + "&modtime=" + modtime + "&view=" + view);
+
+        }
+        function showTree6(ida2a2, name, state, status, modifyer, number, version, modtime, view) {
+            parent.openTab('GET_BOMs6', 'BOM展示(直连)', '${base.contextPath}/bom/tree_new_sql.html?ida2a2=' + ida2a2 + '&name=' + name +
                 '&state=' + state + '&status=' + status + '&modifyer=' + modifyer +
                 '&number=' + number + "&version=" + version + "&modtime=" + modtime + "&view=" + view);
         }

@@ -1,0 +1,1028 @@
+<#include "../include/header.html">
+    <style>
+        .bg-bar {
+            position: relative;
+            background: #f9f9f9;
+            height: 30px;
+            line-height: 30px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .bar-left {
+            padding-left: 10px;
+        }
+
+        .panel {
+            margin-bottom: 0;
+        }
+
+        .panel > .row {
+            margin: 10px auto;
+        }
+
+        .bar-btn {
+            position: absolute;
+            text-align: center;
+            right: 10px;
+            top: 5px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .bar-btn > span {
+            font-size: 22px;
+        }
+
+        .col-xs-offset-1 .form-group {
+            margin: 5px 0;
+        }
+    </style>
+    <head>
+        <link rel="stylesheet" href="/lib/jqwidgets/styles/jqx.base.css" type="text/css" />
+        <script type="text/javascript" src="/lib/jquery-1.11.1.min.js"></script>
+        <script type="text/javascript" src="/lib/jqwidgets/jqxcore.js"></script>
+        <script type="text/javascript" src="/lib/jqwidgets/jqxdata.js"></script>
+        <script type="text/javascript" src="/lib/jqwidgets/jqxbuttons.js"></script>
+        <script type="text/javascript" src="/lib/jqwidgets/jqxscrollbar.js"></script>
+        <script type="text/javascript" src="/lib/jqwidgets/jqxdatatable.js"></script>
+        <script type="text/javascript" src="/lib/jqwidgets/jqxtreegrid.js"></script>
+        <script type="text/javascript" src="/lib/jqwidgets/jqxcheckbox.js"></script>
+        <script type="text/javascript" src="/lib/jqwidgets/jqxlistbox.js"></script>
+        <script type="text/javascript" src="/lib/jqwidgets/jqxdropdownlist.js"></script>
+        <script type="text/javascript" src="/lib/demos.js"></script>
+        <!--进度条-->
+        <link rel="stylesheet" href="//cdn.bootcss.com/nprogress/0.2.0/nprogress.css">
+        <script src="//cdn.bootcss.com/nprogress/0.2.0/nprogress.js"></script>
+        <style>
+            #treeGrid span[id] {
+                display: none !important;
+            }
+        </style>
+        <script>
+
+        </script>
+    </head>
+    <script type="text/javascript">
+        var viewModel = kendo.observable({
+            model: {},
+            //新加子分类
+            createFunction: function () {
+                var length = $("#Grid tbody input[type=checkbox]:checked").length;
+                if (length != 1) {
+                    kendo.ui.showInfoDialog({
+                        message: "请选择一行"
+                    });
+                } else {
+                    var uid = $("#Grid tbody input[type=checkbox]:checked").parents("tr").attr("data-uid");
+                    var treeList = $("#Grid").data("kendoTreeList");
+                    var rowNew = treeList.addRow($('[data-uid=' + uid + ']'));
+                }
+            },
+            //保存
+            saveFunction: function () {
+                $('#Grid').data('kendoTreeList').saveRow();
+            },
+            //展开
+            expandFunction: function (e) {
+                e.preventDefault();
+                var treeList = $("#Grid").data("kendoTreeList");
+                for (var i = 0; i < $("#Grid tbody input[type=checkbox]:checked").length; i++) {
+                    var uid = $("#Grid tbody input[type=checkbox]:checked").eq(i).parents("tr").attr("data-uid");
+                    var row = treeList.content.find("tr[data-uid=" + uid + "]");
+                    treeList.expand(row)
+                }
+            },
+            //收缩
+            compressFunction: function (e) {
+                e.preventDefault();
+                var treeList = $("#Grid").data("kendoTreeList");
+                for (var i = 0; i < $("#Grid tbody input[type=checkbox]:checked").length; i++) {
+                    var uid = $("#Grid tbody input[type=checkbox]:checked").eq(i).parents("tr").attr("data-uid");
+                    var row = treeList.content.find("tr[data-uid=" + uid + "]");
+                    treeList.collapse(row);
+                }
+            },
+            //展开全部
+            expandAllFunction: function (e) {
+                e.preventDefault();
+                var treeList = $("#Grid").data("kendoTreeList"),
+                    row = treeList.content.find("tr:visible").last();
+                treeList.expand(row)
+            },
+            //收缩全部
+            compressAllFunction: function (e) {
+                e.preventDefault();
+                var treeList = $("#Grid").data("kendoTreeList"),
+                    row = treeList.content.find("tr:visible").first();
+                treeList.collapse(row)
+            },
+            //获取产品替换物料
+            getReplacePart: function (e) {
+                e.preventDefault();
+                var length = $("#Grid tbody input[type=checkbox]:checked").length;
+                if (length != 1) {
+                    kendo.ui.showInfoDialog({
+                        message: "请选择一行"
+                    });
+                } else {
+                    var linkida2a2 = $("#Grid tbody input[type=checkbox]:checked").eq(0).attr("data-linkida2a2");
+
+                    var replacePartDataSource = new kendo.data.DataSource({
+                        transport: {
+                            read: {
+                                url: "${base.contextPath}/bom/replace/part/query?ida2a2=" + linkida2a2,
+                                type: "POST",
+                                dataType: "json"
+                            },
+                            parameterMap: function (options, type) {
+                                if (type === "read") {
+                                    return Hap.prepareQueryParameter(replacePart_viewModel.model.toJSON(), options);
+                                }
+                            }
+                        },
+                        batch: true,
+                        //serverPaging: true,
+                        pageSize: 10,
+                        schema: {
+                            data: 'rows',
+                            total: 'total',
+                            model: {
+                                id: 'partId',
+                                fields: {}
+                            }
+                        }
+                    });
+                    var replacePartGrid = $("#replacePart-Grid").kendoGrid({
+                        dataSource: replacePartDataSource,
+                        navigatable: false,
+                        height: "310px",
+                        resizable: true,
+                        scrollable: true,
+                        rownumber: true,
+                        pageable: {
+                            pageSizes: [5, 10, 20, 50],
+                            refresh: true,
+                            buttonCount: 5
+                        },
+                        columns: [
+                            {
+                                field: "number",
+                                title: '替换物料编号',
+                                width: 120,
+                                attributes: {style: "text-align:center"},
+                                headerAttributes: {
+                                    "class": "table-header-cell",
+                                    style: "text-align: center"
+                                },
+                            },
+                            {
+                                field: "name",
+                                title: '替换物料名称',
+                                width: 120,
+                                attributes: {style: "text-align:center"},
+                                headerAttributes: {
+                                    "class": "table-header-cell",
+                                    style: "text-align: center"
+                                },
+                            },
+                            {
+                                field: "container",
+                                title: '容器名称',
+                                width: 120,
+                                attributes: {style: "text-align:center"},
+                                headerAttributes: {
+                                    "class": "table-header-cell",
+                                    style: "text-align: center"
+                                },
+                            },
+                        ],
+                        editable: false
+                    }).data("kendoGrid");
+                    $("#replacePart-dialog").kendoWindow({
+                        modal: true
+                    });
+                    var win = $("#replacePart-dialog").data("kendoWindow");
+                    win.modal = true;
+                    win.center().open();
+                }
+            },
+            //获取产品关联文
+            getReplaceDoc: function (e) {
+                e.preventDefault();
+                var length = $("#Grid tbody input[type=checkbox]:checked").length;
+                if (length != 1) {
+                    kendo.ui.showInfoDialog({
+                        message: "请选择一行"
+                    });
+                } else {
+                    var id = $("#Grid tbody input[type=checkbox]:checked").eq(0).attr("data-id");
+
+                    var replacePartDataSource = new kendo.data.DataSource({
+                        transport: {
+                            read: {
+                                url: "${base.contextPath}/bom/related/doc/query?ida2a2=" + id,
+                                type: "POST",
+                                dataType: "json"
+                            },
+                            parameterMap: function (options, type) {
+                                if (type === "read") {
+                                    return Hap.prepareQueryParameter(replaceDoc_viewModel.model.toJSON(), options);
+                                }
+                            }
+                        },
+                        batch: true,
+                        //serverPaging: true,
+                        pageSize: 10,
+                        schema: {
+                            data: 'rows',
+                            total: 'total',
+                            model: {
+                                id: 'relatedDocId',
+                                fields: {}
+                            }
+                        }
+                    });
+                    var replaceDocGrid = $("#replaceDoc-Grid").kendoGrid({
+                        dataSource: replacePartDataSource,
+                        navigatable: false,
+                        height: "310px",
+                        resizable: true,
+                        scrollable: true,
+                        rownumber: true,
+                        pageable: {
+                            pageSizes: [5, 10, 20, 50],
+                            refresh: true,
+                            buttonCount: 5
+                        },
+                        columns: [
+                            {
+                                field: "docnum",
+                                title: '文档编号',
+                                width: 120,
+                                attributes: {style: "text-align:center"},
+                                headerAttributes: {
+                                    "class": "table-header-cell",
+                                    style: "text-align: center"
+                                },
+                            },
+                            {
+                                field: "docname",
+                                title: '文档名称',
+                                width: 120,
+                                attributes: {style: "text-align:center"},
+                                headerAttributes: {
+                                    "class": "table-header-cell",
+                                    style: "text-align: center"
+                                },
+                            },
+                            {
+                                field: "modifyer",
+                                title: '修改人',
+                                width: 120,
+                                attributes: {style: "text-align:center"},
+                                headerAttributes: {
+                                    "class": "table-header-cell",
+                                    style: "text-align: center"
+                                },
+                            },
+                            {
+                                field: "modtime",
+                                title: '修改时间',
+                                width: 120,
+                                attributes: {style: "text-align:center"},
+                                headerAttributes: {
+                                    "class": "table-header-cell",
+                                    style: "text-align: center"
+                                },
+                            },
+                            {
+                                field: "version",
+                                title: '文档版本',
+                                width: 120,
+                                attributes: {style: "text-align:center"},
+                                headerAttributes: {
+                                    "class": "table-header-cell",
+                                    style: "text-align: center"
+                                },
+                            },
+                            {
+                                field: "status",
+                                title: '状况',
+                                width: 120,
+                                attributes: {style: "text-align:center"},
+                                headerAttributes: {
+                                    "class": "table-header-cell",
+                                    style: "text-align: center"
+                                },
+                            },
+                            {
+                                field: "state",
+                                title: '状态',
+                                width: 120,
+                                attributes: {style: "text-align:center"},
+                                headerAttributes: {
+                                    "class": "table-header-cell",
+                                    style: "text-align: center"
+                                },
+                            },
+                            {
+                                field: "container",
+                                title: '容器',
+                                width: 120,
+                                attributes: {style: "text-align:center"},
+                                headerAttributes: {
+                                    "class": "table-header-cell",
+                                    style: "text-align: center"
+                                },
+                            },
+                            {
+                                field: "doctype",
+                                title: '文档类型',
+                                width: 120,
+                                attributes: {style: "text-align:center"},
+                                headerAttributes: {
+                                    "class": "table-header-cell",
+                                    style: "text-align: center"
+                                },
+                            }
+                        ],
+                        editable: false
+                    }).data("kendoGrid");
+                    $("#replaceDoc-dialog").kendoWindow({
+                        modal: true
+                    });
+                    var win = $("#replaceDoc-dialog").data("kendoWindow");
+                    win.modal = true;
+                    win.center().open();
+                }
+            }
+        });
+
+        //获取产品替换物料viewModel
+        var replacePart_viewModel = kendo.observable({
+            model: {}
+        });
+
+        //获取产品关联文viewModel
+        var replaceDoc_viewModel = kendo.observable({
+            model: {}
+        });
+    </script>
+    <body>
+    <form id="base_info_form" class="modal-content form-horizontal" role="form">
+        <div class="bg-bar">
+            <span class="bar-left">基本信息</span>
+            <div class="bar-btn">
+                <span class="fa fa-angle-double-up"></span>
+            </div>
+        </div>
+        <div class="col-xs-offset-1">
+            <div class="form-group">
+                <div class="col-xs-5" style="text-align: center">
+                    <span id="title"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-2 control-label">名称</label>
+                <div class="col-xs-3">
+                    <input id="name" type="text" style='border-left:0px;border-top:0px;border-right:0px;'
+                           readonly="true">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-2 control-label">状态</label>
+                <div class="col-xs-3">
+                    <input id="status" type="text" style='border-left:0px;border-top:0px;border-right:0px; '
+                           readonly="true">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-2 control-label">状况</label>
+                <div class="col-xs-3">
+                    <input id="state" type="text" style='border-left:0px;border-top:0px;border-right:0px; '
+                           readonly="true">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-2 control-label">修改者</label>
+                <div class="col-xs-3">
+                    <input id="modifyer" type="text" style='border-left:0px;border-top:0px;border-right:0px; '
+                           readonly="true">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-2 control-label">位置</label>
+                <div class="col-xs-3">
+                    <input id="location" type="text" style='border-left:0px;border-top:0px;border-right:0px; '
+                           readonly="true">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-2 control-label">成品</label>
+                <div class="col-xs-3">
+                    <input id="is" type="text" style='border-left:0px;border-top:0px;border-right:0px;' readonly="true"
+                           value="是">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-2 control-label">默认跟踪代码</label>
+                <div class="col-xs-3">
+                    <input id="value1" type="text" style='border-left:0px;border-top:0px;border-right:0px;'
+                           readonly="true" value="序列号">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-2 control-label">产品生命周期状态</label>
+                <div class="col-xs-3">
+                    <input id="value2" type="text" style='border-left:0px;border-top:0px;border-right:0px; '
+                           readonly="true">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-2 control-label">是否认证产品</label>
+                <div class="col-xs-3">
+                    <input id="value3" type="text" style='border-left:0px;border-top:0px;border-right:0px;'
+                           readonly="true">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-2 control-label"></label>
+                <div class="col-xs-3">
+                    <a href="javascript:;" onclick="showTree()">更多信息</a>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div id="page-content">
+        <div class="pull-left" id="toolbar-btn" style="padding-bottom:10px;">
+        <span class="btn btn-primary k-grid-add" style="float:left;margin-right:5px;" data-bind="click:createFunction">
+            <i class="fa fa-plus-square" style="margin-right:3px;"></i>新建子分类</span>
+            <span class="btn btn-success k-grid-save-changes" data-bind="click:saveFunction"
+                  style="float:left;margin-right:5px;">
+            <i class="fa fa-save" style="margin-right:3px;"></i><@spring.message "hap.save"/></span>
+            <span class="btn btn-primary" data-bind="click:expandFunction" style="float:left;margin-right:5px;">
+            <i class="fa fa-expand" style="margin-right:3px;"></i>展开</span>
+            <span class="btn btn-warning" data-bind="click:compressFunction" style="float:left;margin-right:5px;">
+            <i class="fa fa-compress" style="margin-right:3px;"></i>收缩</span>
+
+            <span class="btn btn-primary" data-bind="click:expandAllFunction" style="float:left;margin-right:5px;">
+            <i class="fa fa-expand" style="margin-right:3px;"></i>展开全部</span>
+            <span class="btn btn-warning" data-bind="click:compressAllFunction" style="float:left;margin-right:5px;">
+            <i class="fa fa-compress" style="margin-right:3px;"></i>收缩全部</span>
+            <span class="btn btn-info" data-bind="click:getReplacePart" style="float:left;margin-right:5px;">
+            <i class="fa fa-hand-o-up" style="margin-right:3px;"></i>获取产品替换物料</span>
+            <span class="btn btn-info" data-bind="click:getReplaceDoc" style="float:left;margin-right:5px;">
+            <i class="fa fa-hand-o-up" style="margin-right:3px;"></i>获取产品关联文</span>
+        </div>
+        <div style="clear:both">
+            <div id="Grid" style="margin-bottom: 30px;"></div>
+        </div>
+        <div id="dialog"></div>
+    </div>
+
+    <div style="float: left;height: 100px;margin-right: 10px;">
+        <button id="collapseAll" style="display: block;">收缩全部</button>
+        <button id="expandAll" style="display: block;margin-top: 5px;">展开全部</button>
+        <button id="collapseOne" style="display: block;margin-top: 5px;">收缩</button>
+        <button id="expandOne" style="display: block;margin-top: 5px;">展开</button>
+    </div>
+    <div style="float: left;margin-right: 10px;">
+        <span style="width: 120px;text-align: center;display: inline-block;font-size: 14px;margin-bottom: 5px;">显示/隐藏列</span>
+        <div id="jqxlistbox">
+        </div>
+        <span style="width: 120px;text-align: center;display: inline-block;font-size: 14px;margin-bottom: 5px;">锁定/解锁列</span>
+        <div id="jqxlistbox2">
+        </div>
+    </div>
+    <div style="float: left;" id="treeGrid"></div>
+    </div>
+
+    <!--获取产品替换物料-->
+    <div id="replacePart-dialog">
+        <div style="clear:both;padding: 0 10px;">
+            <div id="replacePart-Grid"></div>
+        </div>
+    </div>
+
+    <!--获取产品关联文-->
+    <div id="replaceDoc-dialog">
+        <div style="clear:both;padding: 0 10px;">
+            <div id="replaceDoc-Grid"></div>
+        </div>
+    </div>
+
+
+    <script type="text/javascript">
+        var checkedIds = {};
+
+        //on click of the checkbox:
+        function selectRow() {
+            var checked = this.checked;
+            row = $(this).closest("tr");
+            grid = $("#Grid").data("kendoTreeList");
+            dataItem = grid.dataItem(row);
+            checkedIds[dataItem] = checked;
+            if (checked) {
+                //-select the row
+                row.addClass("k-state-selected");
+            } else {
+                //-remove selection
+                row.removeClass("k-state-selected");
+            }
+
+        }
+        //on dataBound event restore previous selected rows:
+        function onDataBound(e) {
+            var view = this.dataSource.view();
+            for (var i = 0; i < view.length; i++) {
+                if (checkedIds[view[i].id]) {
+                    this.tbody.find("tr[data-uid='" + view[i].uid + "']")
+                        .addClass("k-state-selected").find(".checkbox")
+                        .attr("checked", "checked");
+                }
+            }
+        }
+
+
+        var ida2a2 = '${RequestParameters.ida2a2}';
+        var name = '${RequestParameters.name}';
+        var state = '${RequestParameters.state}';
+        var status = '${RequestParameters.status}';
+        var modifyer = '${RequestParameters.modifyer}';
+        var number = '${RequestParameters.number}';
+        var version = '${RequestParameters.version}';
+        var modtime = '${RequestParameters.modtime}';
+        var view = '${RequestParameters.view}';
+        $("#name").val(name);
+        $("#state").val(state);
+        $("#status").val(status);
+        $("#modifyer").val(modifyer + "于" + modtime + " 修改");
+        document.getElementById("title").innerText = "产品-" + ida2a2 + "," + version + "," + number;
+        kendo.bind($('#page-content'), viewModel);
+        var BaseUrl = _basePath;
+        var selectedDataItems = [];
+
+
+        //add by zixi.xie@hand-china.com
+        $(function () {
+            //获取数据源
+            var dataSource = new kendo.data.TreeListDataSource({
+                transport: {
+                    read: {
+                        url: BaseUrl + "/bom/bom/queryAllMysql?idida2a2=" + ida2a2 + "&version=" + version + "&number=" + number + "&name=" + name + "&view=" + view,
+                        //url: BaseUrl + "/bom/bom/test?idida2a2="+ida2a2+"&version="+version+"&number="+number+"&name="+name+"&view="+view,
+                        type: "POST",
+                        dataType: "json"
+                    },
+                    update: {
+                        url: BaseUrl + "/bom/bom/submit",
+                        type: "POST",
+                        contentType: "application/json"
+                    },
+                    destroy: {
+                        url: BaseUrl + "/bom/bom/remove",
+                        type: "POST",
+                        contentType: "application/json"
+                    },
+                    create: {
+                        url: BaseUrl + "/bom/bom/submit",
+                        type: "POST",
+                        contentType: "application/json"
+                    },
+                    parameterMap: function (options, type) {
+                        if (type !== "read" && options.models) {
+                            var datas = Hap.prepareSubmitParameter(options, type)
+                            return kendo.stringify(datas);
+                        }
+                    }
+                },
+                batch: true,
+                schema: {
+                    data: 'rows',
+                    model: {
+                        id: "id",
+                        parentId: "parentid",
+                        expanded: true,
+                        fields: {
+                            bomId: {type: "number", editable: false, nullable: false},
+                            parentid: {nullable: true, type: "number"},
+                            childnum: {validation: {required: true}},
+                        },
+                    }
+                }
+            });
+            //初始化tree
+            var tree = $("#Grid").kendoTreeList({
+                dataSource: dataSource,
+                columnMenu: true,
+                reorderable: true,
+                resizable: true,
+                scrollable: true,
+                navigatable: false,
+                editable: true,
+                selectable: 'row',
+                height: "200px",
+                change: function (e) {
+                    var selectedRows = this.select();
+                    for (var i = 0; i < selectedRows.length; i++) {
+                        var dataItem = this.dataItem(selectedRows[i]);
+                        selectedDataItems.push(dataItem);
+                    }
+                },
+                pageable: {
+                    pageSizes: [5, 10, 20, 50],
+                    refresh: true,
+                    buttonCount: 5
+                },
+                columns: [
+                    {
+                        headerTemplate: '<input type="checkbox" id="check-all"/>',
+                        locked: true,
+                        template: function (dataItem) {
+                            if (dataItem.childnum == null || dataItem.childnum == "") {
+                                return "";
+                            } else {
+                                return "<input data-linkida2a2=" +
+                                    dataItem.linkida2a2 + " data-id=" +
+                                    dataItem.id + " type='checkbox' name='check'   />";
+                            }
+                        },
+                        width: 60,
+                        headerAttributes: {
+                            style: "text-align: center;"
+                        },
+                        attributes: {
+                            "class": "table-header-cell",
+                            style: "text-align: center;"
+                        }
+                    },
+                    {
+                        field: "childnum",
+                        title: '编码',
+                        width: 200,
+                        expandable: true
+                    },
+                    {
+                        title: '层级',
+                        width: 85,
+                        attributes: {style: "text-align:center"},
+                        headerAttributes: {
+                            style: "text-align: center"
+                        },
+                        template: function (dataItem) {
+                            var level = dataSource.level(dataItem);
+                            if (level == 0) {
+                                return 'ROOT';
+                            } else {
+                                return 'LEVEL ' + level;
+                            }
+                        }
+                    },
+                    /* {
+                     title: '操作',
+                     width: 100 ,
+                     attributes: {style: "text-align:center"},
+                     template: function (dataItem) {
+                     return '<span class="btn btn-primary btn-xs" onclick="addChildren(\''+dataItem.uid+'\','+dataSource.level(dataItem)+','+dataItem.bomId+')">增加子分类</>'
+                     },
+                     headerAttributes: {
+                     style  : "text-align: center"
+                     }
+                     },*/
+                    {
+                        title: '不推荐',
+                        width: 120
+                    },
+                    {
+                        title: '物料综合等级',
+                        width: 120
+                    },
+                    {
+                        field: "childname",
+                        title: '名称',
+                        width: 120
+                    },
+                    {
+                        field: "specification",
+                        title: '型号规格',
+                        width: 120
+                    },
+                    {
+                        field: "version",
+                        title: '版本',
+                        width: 120
+                    },
+                    {
+                        field: "linenum",
+                        title: '行号',
+                        width: 120
+                    },
+                    {
+                        field: "occurrence",
+                        title: '位号',
+                        width: 120
+                    },
+                    {
+                        field: "amount",
+                        title: '数量',
+                        width: 120
+                    },
+                    {
+                        field: "unit",
+                        title: '默认单位',
+                        width: 120
+                    },
+                    {
+                        field: "linkweight",
+                        title: '重量',
+                        width: 120
+                    },
+                    {
+                        field: "source",
+                        title: '关系来源',
+                        width: 120
+                    },
+                    {
+                        field: "isborrow",
+                        title: '是否借用',
+                        width: 120
+                    },
+                    {
+                        field: "drawingsize",
+                        title: '图幅',
+                        width: 120
+                    },
+                    {
+                        field: "cadtype",
+                        title: '图纸类型',
+                        width: 120
+                    },
+                    {
+                        field: "drawingtype",
+                        title: '图样类型',
+                        width: 120
+                    },
+                    {
+                        field: "view",
+                        title: '视图',
+                        width: 120
+                    },
+                    {
+                        title: "Edit", command: ["edit", "destroy"], width: 250,
+                        attributes: {
+                            style: "text-align: center;"
+                        }
+                    },
+                ],
+                messages: {
+                    commands: {
+                        edit: "编辑",
+                        update: "保存",
+                        canceledit: "取消",
+                        destroy: "删除"
+                    }
+                }
+            }).data("kendoTreeList");
+
+            //全选
+            $("#check-all").click(function (e) {
+                $("#Grid tbody input[type=checkbox]").prop("checked", $(this).is(":checked"))
+            });
+            //产生对象收缩展开
+            $("#base_info_form").on("click", ".bar-btn", function (e) {
+                e.preventDefault();
+                var classStr = $(this).find("span").attr("class") == 'fa fa-angle-double-up' ? 'fa fa-angle-double-down' : 'fa fa-angle-double-up';
+                $(this).find("span").removeClass().addClass(classStr);
+                $("#base_info_form").find(".col-xs-offset-1").toggle(0);
+            });
+
+            //产品替换物信息展示window
+            $("#replacePart-dialog").kendoWindow({
+                width: 900,
+                height: 340,
+                title: "产品替换物信息展示",
+                resizable: false,
+                visible: false,
+                close: function (e) {
+                    //弹出窗 close 的时候，把它销毁，避免事件的重复绑定
+                    var replacePartGrid = $("#replacePart-Grid").data("kendoGrid");
+                    replacePartGrid.destroy();
+                }
+            }).data("kendoWindow");
+
+            //产品关联文信息展示window
+            $("#replaceDoc-dialog").kendoWindow({
+                width: 900,
+                height: 340,
+                title: "产品关联文信息展示",
+                resizable: false,
+                visible: false,
+                close: function (e) {
+                    //弹出窗 close 的时候，把它销毁，避免事件的重复绑定
+                    var replaceDocGrid = $("#replaceDoc-Grid").data("kendoGrid");
+                    replaceDocGrid.destroy();
+                }
+            }).data("kendoWindow");
+
+
+        });
+
+
+        /*grid = $("#Grid").data("kendoTreeList");
+         grid.table.on("click", ".checkbox", selectRow);*/
+        function changeParent(id) {
+            var dialog = $("#dialog").kendoWindow({
+                actions: ["Close"],
+//            animation: {
+//                close: {
+//                    effects: "fadeOut zoom:out",
+//                    duration: 300
+//                },
+//                open: {
+//                    effects: "fadeIn zoom:in",
+//                    duration: 300
+//                }
+//            },
+                width: 400,
+                height: 450,
+                title: '选择父节点',
+                visible: false,
+                iframe: true,
+                modal: true,
+                close: function () {
+                    $('#Grid').data('kendoTreeList').dataSource.page(1);
+                },
+                content: 'employees_parent.html?id=' + id
+            }).data("kendoWindow");
+            dialog.center().open();
+        }
+        function deleteData() {
+
+            //  Hap.deleteGridSelection({
+            //    grid: $('#Grid')
+            // });
+
+        }
+
+        Hap.autoResizeGrid("#Grid");
+
+
+    </script>
+    </body>
+    <script type="text/javascript">
+        NProgress.start();
+        var dataJson = null;
+        $.ajax({
+            /*url:"${base.contextPath}/bom/bom/queryAll?pagesize=10000",*/
+            url:"${base.contextPath}/bom/bom/queryAllMysql?idida2a2=2225730112&version=B.9&number=TE003-337600&name=TE003-337600&view=设计",
+            async:false,
+            success:function (data) {
+                dataJson = data.rows;
+            }
+        });
+        $(document).ready(function () {
+            NProgress.done();
+            var source =
+                {
+                    dataType: "json",
+                    dataFields: [
+                        { name: 'id', type: 'number' },
+                        { name: 'parentid', type: 'number' },
+                        { name: 'state', type: 'string' },
+                        { name: 'total', type: 'number' },
+                        { name: 'linenum', type: 'number' },
+                        { name: 'amount', type: 'number' },
+                        { name: 'childnum', type: 'string' },
+                        { name: 'childname', type: 'string' },
+                        { name: 'partstate', type: 'string' },
+                        { name: 'status', type: 'string' },
+                        { name: 'version', type: 'string' },
+                        { name: 'view', type: 'string' },
+                        { name: 'cadtype', type: 'string' }
+                    ],
+                    hierarchy:
+                        {
+                            keyDataField: { name: 'id' },
+                            parentDataField: { name: 'parentid' }
+                        },
+                    id: 'id',
+                    localData: dataJson
+                };
+            var dataAdapter = new $.jqx.dataAdapter(source);
+            // create Tree Grid
+            $("#treeGrid").jqxTreeGrid(
+                {
+                    width: 800,
+                    source: dataAdapter,
+                    /*hierarchicalCheckboxes: true,*/
+                    altRows: true,
+                    checkboxes:true,
+                    filterable: true,
+                    ready: function()
+                    {
+                        // expand row with 根节点id
+                        $("#treeGrid").jqxTreeGrid('expandRow', 32);
+                    },
+                    columns: [
+                        { text: '子件编号', dataField: 'childnum', minWidth: 100, width: 200 ,pinned: true},
+                        { text: '子件名称', dataField: 'childname', minWidth: 100, width: 200 ,pinned: false},
+                        { text: '状态', dataField: 'state', minWidth: 100, width: 120,pinned: false },
+                        { text: '总数', dataField: 'total', minWidth: 100, width: 120 ,pinned: false},
+                        { text: '行号', dataField: 'linenum', minWidth: 100, width: 120 ,pinned: false},
+                        { text: '数量', dataField: 'amount', minWidth: 100, width: 120 ,pinned: false},
+                        { text: '状态', dataField: 'partstate', minWidth: 100, width: 120,pinned: false },
+                        { text: '状况', dataField: 'status', minWidth: 100, width: 120 ,pinned: false},
+                        { text: '版本', dataField: 'version', minWidth: 100, width: 120 ,pinned: false},
+                        { text: '视图', dataField: 'view', minWidth: 100, width: 120 ,pinned: false},
+                        { text: '图纸类型', dataField: 'cadtype', minWidth: 100, width: 120 ,pinned: false}
+                    ]
+                });
+        });
+
+
+        var listSource = [
+            {label: '子件编号', value: 'childnum', checked: true },
+            {label: '子件名称', value: 'childname', checked: true },
+            { label: '状态', value: 'state', checked: true },
+            { label: '总数', value: 'total', checked: true },
+            {label: '行号', value: 'linenum', checked: true },
+            {label: '数量', value: 'amount', checked: true },
+            {label: '状态', value: 'partstate', checked: true },
+            {label: '状况', value: 'status', checked: true },
+            {label: '版本', value: 'version', checked: true },
+            {label: '视图', value: 'view', checked: true },
+            {label: '图纸类型', value: 'cadtype', checked: true},
+        ];
+
+        var listSource2 = [
+            {label: '子件编号', value: 'childnum', checked: true },
+            {label: '子件名称', value: 'childname', checked: false },
+            { label: '状态', value: 'state', checked: false },
+            { label: '总数', value: 'total', checked: false },
+            {label: '行号', value: 'linenum', checked: false },
+            {label: '数量', value: 'amount', checked: false },
+            {label: '状态', value: 'partstate', checked: false },
+            {label: '状况', value: 'status', checked: false },
+            {label: '版本', value: 'version', checked: false },
+            {label: '视图', value: 'view', checked: false },
+            {label: '图纸类型', value: 'cadtype', checked: false},
+        ];
+
+
+        $("#jqxlistbox").jqxListBox({source: listSource, width: 120, height: 200,  checkboxes: true });
+        $("#jqxlistbox").on('checkChange', function (event) {
+            NProgress.start();
+            $("#treeGrid").jqxTreeGrid('beginUpdate');
+            if (event.args.checked) {
+                $("#treeGrid").jqxTreeGrid('showColumn', event.args.value);
+            }
+            else {
+                $("#treeGrid").jqxTreeGrid('hideColumn', event.args.value);
+            }
+            $("#treeGrid").jqxTreeGrid('endUpdate');
+            NProgress.done();
+        });
+
+        $("#jqxlistbox2").jqxListBox({source: listSource2, width: 120, height: 200,  checkboxes: true });
+        $("#jqxlistbox2").on('checkChange', function (event) {
+            NProgress.start();
+            $("#treeGrid").jqxTreeGrid('beginUpdate');
+            $("#treeGrid").jqxTreeGrid('setColumnProperty', event.args.value, 'pinned', event.args.checked);
+            $("#treeGrid").jqxTreeGrid('endUpdate');
+            NProgress.done();
+        });
+
+
+
+        $("#collapseAll").click(function () {
+            NProgress.start();
+            $("#treeGrid").jqxTreeGrid('collapseAll');
+            NProgress.done();
+        });
+
+
+        $("#expandAll").click(function () {
+            NProgress.start();
+            $("#treeGrid").jqxTreeGrid('expandAll');
+            NProgress.done();
+        });
+
+        $("#expandOne").click(function () {
+            var selection = $("#treeGrid").jqxTreeGrid('getCheckedRows');
+            for (var i = 0; i < selection.length; i++) {
+                $("#treeGrid").jqxTreeGrid('expandRow',selection[i].id);
+            }
+        });
+
+        $("#collapseOne").click(function () {
+            var selection = $("#treeGrid").jqxTreeGrid('getCheckedRows');
+            for (var i = 0; i < selection.length; i++) {
+                $("#treeGrid").jqxTreeGrid('collapseRow',selection[i].id);
+            }
+        });
+
+        $('#treeGrid').on('bindingComplete', function (event) { NProgress.done(); });
+
+    </script>
+    </html>
