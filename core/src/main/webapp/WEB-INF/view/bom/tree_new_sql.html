@@ -96,13 +96,13 @@
             //获取产品替换物料
             getReplacePart: function (e) {
                 e.preventDefault();
-                var length =$("#treeGrid").jqxTreeGrid('getCheckedRows').length;
+                var length =$("#treeGrid").jqxTreeGrid('getSelection').length;
                 if (length != 1) {
                     kendo.ui.showInfoDialog({
                         message: "请选择一行"
                     });
                 } else {
-                    var linkida2a2 = $("#treeGrid").jqxTreeGrid('getCheckedRows')[0].linkida2a2;
+                    var linkida2a2 = $("#treeGrid").jqxTreeGrid('getSelection')[0].linkida2a2;
 
                     var replacePartDataSource = new kendo.data.DataSource({
                         transport: {
@@ -186,13 +186,13 @@
             //获取产品关联文
             getReplaceDoc: function (e) {
                 e.preventDefault();
-                var length =$("#treeGrid").jqxTreeGrid('getCheckedRows').length;
+                var length =$("#treeGrid").jqxTreeGrid('getSelection').length;
                 if (length != 1) {
                     kendo.ui.showInfoDialog({
                         message: "请选择一行"
                     });
                 } else {
-                    var id =  $("#treeGrid").jqxTreeGrid('getCheckedRows')[0].id;
+                    var id =  $("#treeGrid").jqxTreeGrid('getSelection')[0].id;
 
                     var replacePartDataSource = new kendo.data.DataSource({
                         transport: {
@@ -652,7 +652,7 @@
                 NProgress.start();
                 var selection = $("#treeGrid").jqxTreeGrid('getCheckedRows');
                 for (var i = 0; i < selection.length; i++) {
-                    if(selection[i].hasChildren){
+                    if(selection[i].total>0){
                         $("#treeGrid").jqxTreeGrid('expandRow',selection[i].id);
                     }
                 }
@@ -663,7 +663,7 @@
                 NProgress.start();
                 var selection = $("#treeGrid").jqxTreeGrid('getCheckedRows');
                 for (var i = 0; i < selection.length; i++) {
-                    if(selection[i].hasChildren){
+                    if(selection[i].total>0){
                         $("#treeGrid").jqxTreeGrid('collapseRow',selection[i].id);
                     }
                 }

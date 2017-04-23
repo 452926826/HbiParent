@@ -241,6 +241,8 @@ public class BomController extends BaseController {
         b.setChildnum(number);
         b.setChildname(name);
         b.setVersion(version);
+        b.setTotal("1");
+        b.setState("closed");
         List<Bom> list = new ArrayList<>();
         if ("设计" == view || "设计".equals(view)) {
             list = oservice.getBomsT(id);
