@@ -226,7 +226,7 @@
        NProgress.start();
        var selection = $("#treeGrid").jqxTreeGrid('getCheckedRows');
        for (var i = 0; i < selection.length; i++) {
-           if(selection[i].hasChildren){
+           if(selection[i].total>0){
                $("#treeGrid").jqxTreeGrid('expandRow',selection[i].id);
            }
        }
@@ -237,7 +237,7 @@
         NProgress.start();
         var selection = $("#treeGrid").jqxTreeGrid('getCheckedRows');
         for (var i = 0; i < selection.length; i++) {
-            if(selection[i].hasChildren){
+            if(selection[i].total>0){
                 $("#treeGrid").jqxTreeGrid('collapseRow',selection[i].id);
              }
         }
