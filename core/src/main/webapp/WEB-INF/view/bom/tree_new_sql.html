@@ -499,7 +499,7 @@
         $.ajax({
             /*url:"${base.contextPath}/bom/bom/queryAll?pagesize=10000",
              url:"${base.contextPath}/bom/bom/queryAllMysql?idida2a2=2225730112&version=B.9&number=TE003-337600&name=TE003-337600&view=设计",
-            url:"${base.contextPath}/bom/bom/queryAllMysqlSync?idida2a2=2225730112&version=B.9&number=TE003-337600&name=TE003-337600&view=设计",*/
+             url:"${base.contextPath}/bom/bom/queryAllMysqlSync?idida2a2=2225730112&version=B.9&number=TE003-337600&name=TE003-337600&view=设计",*/
             url:"${base.contextPath}/bom/bom/test?idida2a2="+ida2a2+"&version="+version+"&number="+number+"&name="+name+"&view="+view,
             async:false,
             success:function (data) {
@@ -592,7 +592,7 @@
             ];
 
             var listSource2 = [
-               /* {label: '子件编号', value: 'childnum', checked: true },*/
+                /* {label: '子件编号', value: 'childnum', checked: true },*/
                 {label: '子件名称', value: 'childname', checked: false },
                 {label: '型号规格', value: 'specification', checked: false },
                 { label: '状态', value: 'state', checked: false },
@@ -654,33 +654,44 @@
             });
 
             $("#expandOne").click(function () {
-
                 var selection = $("#treeGrid").jqxTreeGrid('getCheckedRows');
-                if(selection[0].id==ida2a2)
-                {
-                    NProgress.start();
-                    $("#treeGrid").jqxTreeGrid('expandAll');
-                    NProgress.done();
+                if (selection.length==0){
+                    kendo.ui.showInfoDialog({
+                        message:"请至少选择一行"
+                    });
                 }else {
-                    NProgress.start();
-                    for (var i = 0; i < selection.length; i++) {
-                        if (selection[i].total > 0) {
-                            $("#treeGrid").jqxTreeGrid('expandRow', selection[i].id);
+                    if(selection[0].id==ida2a2)
+                    {
+                        NProgress.start();
+                        $("#treeGrid").jqxTreeGrid('expandAll');
+                        NProgress.done();
+                    }else {
+                        NProgress.start();
+                        for (var i = 0; i < selection.length; i++) {
+                            if (selection[i].total > 0 && $("tr[data-key=" + selection[i].id + "]").find("td").eq(0).find("span").hasClass("jqx-icon-arrow-right")) {
+                                $("#treeGrid").jqxTreeGrid('expandRow', selection[i].id);
+                            }
                         }
+                        NProgress.done();
                     }
-                    NProgress.done();
                 }
             });
 
             $("#collapseOne").click(function () {
-                NProgress.start();
                 var selection = $("#treeGrid").jqxTreeGrid('getCheckedRows');
-                for (var i = 0; i < selection.length; i++) {
-                    if(selection[i].total>0){
-                        $("#treeGrid").jqxTreeGrid('collapseRow',selection[i].id);
+                if (selection.length==0){
+                    kendo.ui.showInfoDialog({
+                        message:"请至少选择一行"
+                    });
+                }else {
+                    NProgress.start();
+                    for (var i = 0; i < selection.length; i++) {
+                        if(selection[i].total>0 && $("tr[data-key=" + selection[i].id + "]").find("td").eq(0).find("span").hasClass("jqx-icon-arrow-down")){
+                            $("#treeGrid").jqxTreeGrid('collapseRow',selection[i].id);
+                        }
                     }
+                    NProgress.done();
                 }
-                NProgress.done();
             });
 
             $('#treeGrid').on('bindingComplete', function (event) { NProgress.done(); });
@@ -694,13 +705,13 @@
             });
 
 
-           /* $(window).scroll(function () {
-                if($(window).scrollTop()>410){
-                    $("#toolbar-btn").addClass("fixed-bar");
-                }else if($(window).scrollTop()<=410){
-                    $("#toolbar-btn").removeClass("fixed-bar");
-                }
-            });*/
+            /* $(window).scroll(function () {
+             if($(window).scrollTop()>410){
+             $("#toolbar-btn").addClass("fixed-bar");
+             }else if($(window).scrollTop()<=410){
+             $("#toolbar-btn").removeClass("fixed-bar");
+             }
+             });*/
 
 
         });
