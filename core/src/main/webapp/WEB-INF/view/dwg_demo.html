@@ -1,0 +1,16 @@
+<#include "include/header.html">
+    <body>
+    <script type="text/javascript">
+        var id='${RequestParameters.id}';
+        var token='${RequestParameters.token}';
+        </script>
+    <object id="test" visible="true" classid="CLSID:B6FCC215-D303-11D1-BC6C-0000C078797F" type="application/x-oleobject"
+            width="800" height="600">
+        <param  name="SRC" >
+    </object>
+    <script>
+       // value="${base.contextPath}/lib/files/test1.dwg"
+        document.getElementsByName("SRC")[0].value="http://localhost:8080/sys/attach/file/detail?fileId=1&token=e1d0242eb0960a34f7d2e339063a6200";
+        </script>
+    </body>
+    </html>
