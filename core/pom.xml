@@ -78,11 +78,13 @@
             <artifactId>gson</artifactId>
             <version>2.7</version>
         </dependency>
-       <!-- <dependency>
+       <dependency>
             <groupId>com.artofsolving</groupId>
             <artifactId>jodconverter</artifactId>
-            <version>2.2.1</version>
-        </dependency>-->
+            <scope>system</scope>
+            <version>2.2.2</version>
+           <systemPath>${basedir}\src\main\webapp\lib\office\jodconverter-2.2.2.jar</systemPath>
+        </dependency>
     </dependencies>
     <build>
         <finalName>core</finalName>
